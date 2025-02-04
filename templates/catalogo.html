@@ -1,0 +1,181 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <title>Catálogo de Produtos - Estilo Musical</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <!-- Bootstrap 5 CDN -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <style>
+      body {
+        background-color: #f0f0f0; /* Cor de fundo */
+      }
+      .navbar {
+        background-color: #000000; /* Cor da barra de navegação */
+      }
+      .navbar-brand img {
+        width: 50px;
+        height: auto;
+      }
+      .navbar-brand {
+        color: #FFD700; /* Cor amarela para "Estilo Musical" */
+      }
+      .navbar-brand:hover {
+        color: #FFDD44; /* Cor amarela mais suave ao passar o mouse */
+      }
+      .produto-card {
+        margin-bottom: 20px;
+        transition: transform 0.2s ease-in-out;
+      }
+      .produto-card:hover {
+        transform: scale(1.02);
+      }
+      .produto-imagem {
+        width: 100%;
+        height: 300px;
+        object-fit: contain;
+        border-radius: 8px 8px 0 0;
+        cursor: pointer;
+      }
+      .galeria-imagem {
+        width: 100%;
+        height: 100px;
+        object-fit: contain;
+        margin: 5px;
+        cursor: pointer;
+        border-radius: 8px;
+      }
+      .galeria-imagem:hover {
+        opacity: 0.8;
+      }
+      .card-body {
+        padding: 15px;
+      }
+      .card-title {
+        font-size: 1.25rem;
+        font-weight: bold;
+      }
+      .card-subtitle {
+        font-size: 0.9rem;
+        color: #6c757d;
+      }
+      .card-text {
+        font-size: 1rem;
+      }
+    </style>
+  </head>
+  <body>
+    <!-- Barra de navegação com logo e busca -->
+    <nav class="navbar navbar-expand-lg navbar-light">
+      <a class="navbar-brand" href="/" aria-label="Voltar para a página inicial">
+        <img src="https://scontent.fmxp9-2.fna.fbcdn.net/v/t39.30808-6/448020429_441447745303078_6648644685849405109_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=jrqdElGhlbUQ7kNvgFks8cR&_nc_zt=23&_nc_ht=scontent.fmxp9-2.fna&_nc_gid=AmGvGuCChFvuLQz0AfeSzGW&oh=00_AYDZQlJW9XdCopORUKSGGUhkjcKguP8Hzhk_XYw6LvgKXA&oe=67A3D248" alt="Logo Estilo Musical">
+        Estilo Musical
+      </a>
+      <!-- Formulário de busca -->
+      <form class="d-flex" method="GET" action="/">
+        <input class="form-control me-2" type="search" placeholder="Buscar produto" aria-label="Buscar" name="search" value="{{ request.args.get('search', '') }}">
+        <button class="btn btn-outline-success" type="submit">Buscar</button>
+      </form>
+    </nav>
+
+    <div class="container mt-4">
+      <h1 class="mb-4 text-center">Catálogo de Produtos</h1>
+      <div class="row">
+        {% if produtos %}
+          {% for produto in produtos %}
+            <div class="col-md-4">
+              <div class="card produto-card shadow-sm">
+                <!-- Exibição da imagem principal -->
+                {% if produto.imagemURL %}
+                  <img src="{{ produto.imagemURL }}" alt="{{ produto.descricaoCurta if produto.descricaoCurta else produto.nome }}" class="produto-imagem" onclick="abrirModal('{{ produto.imagemURL }}')">
+                {% else %}
+                  <img src="https://www.jundplay.com.br/lib/img/imagem-nao-disponivel.jpg" alt="Imagem não disponível" class="produto-imagem">
+                {% endif %}
+                <div class="card-body">
+                  <p><span id="descricaoProduto">{{ produto.nome }}</span></p>
+                  <h6 class="card-subtitle mb-2 text-muted">
+                    Código: {{ produto.codigo if produto.codigo else 'N/A' }}
+                  </h6>
+                  <p class="card-text">
+                    <strong>Preço:</strong> <span class="preco" id="precoProduto{{ loop.index }}"></span>
+                  </p>
+                  <!-- Botão para redirecionar para a página produto.html -->
+                  <button class="btn btn-primary" onclick="window.location.href='/produto/{{ produto.codigo }}'">Ver Descrição</button>
+                </div>
+              </div>
+            </div>
+          {% endfor %}
+        {% else %}
+          <p class="text-center">Nenhum produto encontrado.</p>
+        {% endif %}
+      </div>
+    </div>
+
+    <!-- Modal para mostrar a imagem grande -->
+    <div class="modal fade" id="imagemModal" tabindex="-1" aria-labelledby="imagemModalLabel" aria-hidden="true">
+      <div class="modal-dialog modal-lg">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="imagemModalLabel">Imagem do Produto</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body text-center">
+            <img id="imagemModalSrc" src="" alt="Imagem Grande" class="img-fluid">
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Modal para mostrar a descrição completa -->
+    <div class="modal fade" id="descricaoModal" tabindex="-1" aria-labelledby="descricaoModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="descricaoModalLabel">Descrição do Produto</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          </div>
+          <div class="modal-body" id="descricaoModalBody">
+            <!-- Descrição será inserida aqui -->
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Bootstrap JS Bundle -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Função para formatar o preço como Real Brasileiro
+      function formatarPreco(preco) {
+        const formatter = new Intl.NumberFormat('pt-BR', {
+          style: 'currency',
+          currency: 'BRL'
+        });
+        return formatter.format(preco);
+      }
+
+      // Função para abrir o modal com a imagem grande
+      function abrirModal(imagemUrl) {
+        const modal = new bootstrap.Modal(document.getElementById('imagemModal'));
+        const modalImg = document.getElementById('imagemModalSrc');
+        modalImg.src = imagemUrl;
+        modal.show();
+      }
+
+      // Função para exibir a descrição completa no modal
+      function mostrarDescricao(descricao) {
+        const modal = new bootstrap.Modal(document.getElementById('descricaoModal'));
+        const modalBody = document.getElementById('descricaoModalBody');
+        modalBody.innerHTML = descricao;  // Adiciona a descrição ao corpo do modal
+        modal.show();  // Exibe o modal
+      }
+
+      // Formatar e exibir os preços dos produtos
+      document.addEventListener("DOMContentLoaded", function() {
+        {% for produto in produtos %}
+          const precoProduto{{ loop.index }} = {{ produto.preco }};
+          document.getElementById("precoProduto{{ loop.index }}").textContent = formatarPreco(precoProduto{{ loop.index }});
+        {% endfor %}
+      });
+    </script>
+  </body>
+</html>

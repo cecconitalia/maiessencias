@@ -5,3 +5,4 @@ isodate==0.6.1
 itsdangerous==2.2.0
 Jinja2==3.1.4
 Flask==3.1.0
+frozenlist==1.4.1

@@ -243,7 +243,7 @@ def index():
     search_query = request.args.get('search', '').strip().lower()
 
     # Lista das palavras para filtrar
-    palavras = ["essencia", "aromat", "sache", "oleo", "agua", "difus"]
+    palavras = ["essencia", "aromat", "sache", "oleo", "perf", "difus"]
 
     # Obtém todos os produtos (pode ser mais de 100)
     produtos = bling_api.get_all_products()

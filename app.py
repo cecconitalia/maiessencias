@@ -3,6 +3,7 @@ import requests
 import base64
 import logging
 import random
+import json
 from dotenv import load_dotenv
 import os
 from functools import wraps
@@ -239,11 +240,15 @@ def handle_api_errors(f):
 @app.route('/')
 @handle_api_errors
 def index():
+        # Carregar as informações do arquivo JSON
+    with open('informacoes_empresa.json', 'r') as f:
+        informacoes = json.load(f)
+
     """Página principal do catálogo"""
     search_query = request.args.get('search', '').strip().lower()
 
     # Lista das palavras para filtrar
-    palavras = ["essencia", "aromat", "sache", "oleo", "perf", "agua", "água", "difus"]
+    palavras = ["essencia", "aromat", "sache", "oleo", "agua", "difus"]
 
     # Obtém todos os produtos (pode ser mais de 100)
     produtos = bling_api.get_all_products()
@@ -296,11 +301,15 @@ def index():
         produtos=produtos_pagina,
         pagina=pagina,
         total_paginas=total_paginas,
-        message=message,
+        message=message, informacoes=informacoes
     )
 @app.route('/produto/<codigo>')
 @handle_api_errors
 def product_detail(codigo):
+     # Carregar as informações do arquivo JSON
+    with open('informacoes_empresa.json', 'r') as f:
+        informacoes = json.load(f)
+        
     """Página de detalhes do produto"""
     produtos = bling_api.get_all_products()
     produto = next((p for p in produtos if p.get('codigo') == codigo), None)
@@ -308,7 +317,7 @@ def product_detail(codigo):
     if not produto:
         abort(404, description="Produto não encontrado")
         
-    return render_template('produto.html', produto=produto)
+    return render_template('produto.html', produto=produto, informacoes=informacoes)
 
 
 

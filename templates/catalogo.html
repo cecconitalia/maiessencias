@@ -1,101 +1,164 @@
 <!doctype html>
 <html lang="pt-BR">
   <head>
-    <meta charset="utf-8">
-    <title>Catálogo de Produtos - Mai Essencias </title>
+    <meta charset="UTF-8">
+    <title>Catálogo de Produtos - {{ informacoes['nome_empresa'] | tojson | safe }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Bootstrap 5 CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts: Roboto -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
       body {
-        background-color: #f0f0f0;
+        background-color: #f8f9fa;
+        font-family: 'Roboto', sans-serif;
       }
+      /* Navbar atualizada */
       .navbar {
-        background-color: #000000;
+        background-color: #C2185B;
       }
       .navbar-brand img {
-        width: 50px;
+        width: 60px;
         height: auto;
       }
       .navbar-brand {
-        color: #FFD700;
+        color: #fff;
+        font-size: 1.5rem;
+        font-weight: 700;
       }
       .navbar-brand:hover {
-        color: #FFDD44;
+        color: #FFD1DC;
       }
       .navbar-nav .nav-link {
         color: #fff;
+        font-size: 1rem;
       }
       .navbar-nav .nav-link:hover {
-        color: #FFD700;
+        color: #FFD1DC;
       }
-      .navbar-nav .nav-item {
-        margin-right: 15px;
-      }
+      /* Cards de produtos */
       .produto-card {
         margin-bottom: 20px;
         transition: transform 0.2s ease-in-out;
         position: relative;
+        background: #fff;
+        border-radius: 8px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       }
       .produto-card:hover {
-        transform: scale(1.02);
+        transform: translateY(-5px);
+        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
       }
       .produto-imagem {
         width: 100%;
-        height: 300px;
+        height: 250px;
         object-fit: contain;
         border-radius: 8px 8px 0 0;
         cursor: pointer;
+        padding: 15px;
       }
       .card-body {
-        padding: 15px;
+        padding: 20px;
       }
       .card-title {
         font-size: 1.25rem;
-        font-weight: bold;
+        color: #880E4F;
+        font-weight: 700;
+        margin-bottom: 10px;
       }
       .card-subtitle {
         font-size: 0.9rem;
-        color: #6c757d;
+        color: #4A148C;
+        margin-bottom: 12px;
       }
       .card-text {
         font-size: 1rem;
+        color: #6a1b9a;
       }
       .btn-custom {
-        font-size: 14px;
-        padding: 8px 16px;
-        border-radius: 25px;
-        width: 100%;
+        background-color: #C2185B;
+        color: #fff;
+        border: none;
+        font-weight: 500;
+        padding: 10px 20px;
+        border-radius: 5px;
+        transition: all 0.3s ease;
+      }
+      .btn-custom:hover {
+        background-color: #880E4F;
+        color: #fff;
       }
       .whatsapp-btn {
         background-color: #25D366;
         color: white;
-        font-size: 14px;
-        padding: 8px 16px;
-        border-radius: 25px;
+        font-weight: 500;
+        padding: 10px 20px;
+        border-radius: 5px;
         display: inline-flex;
         align-items: center;
         justify-content: center;
         text-decoration: none;
+        transition: all 0.3s ease;
       }
-      .whatsapp-btn i {
-        font-size: 18px;
-        margin-right: 8px;
+      .whatsapp-btn:hover {
+        background-color: #128C7E;
+        color: #fff;
       }
       .btn-group {
         display: flex;
         justify-content: space-between;
-        gap: 10px;
-        margin-top: 10px;
+        gap: 8px;
+        margin-top: 15px;
+      }
+      /* Paginação */
+      .pagination .page-item .page-link {
+        color: #C2185B;
+        border: 1px solid #C2185B;
+      }
+      .pagination .page-item.active .page-link {
+        background-color: #C2185B;
+        border-color: #C2185B;
+        color: white;
+      }
+      /* Footer atualizado */
+      .footer {
+        background-color: #880E4F;
+        color: #fff;
+        padding: 30px 0;
+        text-align: center;
+        margin-top: 40px;
+      }
+      .footer a {
+        color: #FF80AB;
+        text-decoration: none;
+      }
+      .footer a:hover {
+        color: #FFD1DC;
+      }
+      /* Formulário de busca */
+      .form-control:focus {
+        border-color: #C2185B;
+        box-shadow: 0 0 0 0.25rem rgba(194,24,91,0.25);
+      }
+      .btn-outline-success {
+        color: #fff;
+        border-color: #fff;
+      }
+      .btn-outline-success:hover {
+        background-color: #fff;
+        color: #C2185B;
       }
     </style>
   </head>
   <body>
+    <!-- Barra de navegação (mantida conforme atualização de cores) -->
+    <!-- ... resto do código HTML permanece igual ... -->
     <!-- Barra de navegação -->
     <nav class="navbar navbar-expand-lg navbar-light">
       <a class="navbar-brand" href="/" aria-label="Voltar para a página inicial">
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTcoFcbVQ37stOMeVyz_Ym8Ytz941DEQju75g&s" alt="Logo Estilo Musical">
-        Mai Essencias
+        <img src="{{ informacoes['logo_url'] }}" alt="Logo Mai Essencias">
+        {{ informacoes['nome_empresa'] | tojson | safe }}
       </a>
       <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Alternar navegação">
         <span class="navbar-toggler-icon"></span>
@@ -103,7 +166,7 @@
       <div class="collapse navbar-collapse" id="navbarNav">
         <ul class="navbar-nav ms-auto">
           <li class="nav-item">
-            <a class="nav-link" href="#">Áudio e Instrumentos Musicais</a>
+            <a class="nav-link" href="#">{{ informacoes['frase_logo'] | tojson | safe }}</a>
           </li>
         </ul>
       </div>
@@ -115,7 +178,7 @@
     </nav>
 
     <div class="container mt-4">
-      <h1 class="mb-4 text-center">Catálogo de Produtos</h1>
+      <h2 class="mb-4 text-center">Catálogo de Produtos</h2>
       <div class="row">
         {% for produto in produtos %}
           <div class="col-md-4">
@@ -128,8 +191,8 @@
                 <img src="https://www.jundplay.com.br/lib/img/imagem-nao-disponivel.jpg" alt="Imagem não disponível" class="produto-imagem">
               {% endif %}
               <div class="card-body">
-                <h5 class="card-title">{{ produto.nome }}</h5>
-                <h6 class="card-subtitle mb-2 text-muted">Código: {{ produto.codigo }}</h6>
+                <h5 class="card-title">{{ produto.nome | tojson | safe }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Código: {{ produto.codigo | tojson | safe }}</h6>
                 <p class="card-text"><strong>Preço:</strong> {{ produto.preco | brl }}</p>
                 <p class="card-text">
                   <strong>Status:</strong>
@@ -142,7 +205,7 @@
 
                 <div class="btn-group">
                   <button class="btn btn-primary btn-custom" onclick="window.location.href='/produto/{{ produto.codigo }}'">Ver Descrição</button>
-                  <a href="https://wa.me/5549999389426?text=Tenho%20interesse%20em%20comprar%20esse%20produto%20{{ produto.nome }}%20-%20{{ produto.codigo }}%20-%20https://estilomusical.onrender.com/produto/{{ produto.codigo }}" class="whatsapp-btn">
+                  <a href="https://wa.me/{{ informacoes['whats'] }}?text=Tenho%20interesse%20em%20comprar%20esse%20produto%20{{ produto.nome | tojson | safe }}%20-%20{{ produto.codigo | tojson | safe }}%20-%20https://estilomusical.onrender.com/produto/{{ produto.codigo | tojson | safe }}" class="whatsapp-btn">
                     <i class="bi-whatsapp"></i> Whats
                   </a>
                 </div>
@@ -180,6 +243,12 @@
           </ul>
         </nav>
       {% endif %}
+    </div>
+
+    <!-- Rodapé -->
+    <div class="footer">
+      <p>{{ informacoes['endereco'] | tojson | safe }}</p>
+      <p><a href="https://wa.me/{{ informacoes['whats'] }}" target="_blank">Entre em contato pelo WhatsApp</a></p>
     </div>
 
     <!-- Bootstrap JS Bundle -->

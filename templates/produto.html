@@ -2,66 +2,100 @@
 <html lang="pt-BR">
   <head>
     <meta charset="utf-8">
-    <title>{{ produto['nome'] }}</title>
+    <title>{{ produto.nome }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Bootstrap 5 CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts: Roboto -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
     <style>
       body {
         background-color: #f8f9fa;
-        font-family: Arial, Helvetica, sans-serif;
+        font-family: 'Roboto', sans-serif;
       }
+      /* Navbar com fundo rosa vibrante */
       .navbar {
-        background-color: #000000;
+        background-color: #C2185B;
       }
       .navbar-brand img {
-        width: 50px;
+        width: 60px;
         height: auto;
       }
       .navbar-brand {
-        color: #FFD700;
+        color: #fff;
+        font-size: 1.5rem;
+        font-weight: 700;
       }
       .navbar-brand:hover {
-        color: #FFDD44;
+        color: #FFD1DC;
       }
+      /* Produto */
       .produto-imagem {
         width: 100%;
-        height: auto;
-        object-fit: contain;
+        max-height: 500px;
+        object-fit: cover;
         border-radius: 8px;
         cursor: pointer;
-      }
-      .detalhes-produto {
-        background-color: white;
-        border-radius: 8px;
-        padding: 20px;
         box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       }
+      .detalhes-produto {
+        background-color: #fff;
+        border-radius: 8px;
+        padding: 30px;
+        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
+      }
       .detalhes-produto h1 {
-        font-size: 2rem;
-        color: #343a40;
+        font-size: 2.5rem;
+        color: #880E4F;
+        font-weight: 700;
       }
       .detalhes-produto p {
-        font-size: 1rem;
-        color: #495057;
+        font-size: 1.1rem;
+        color: #4A148C;
       }
-      .detalhes-produto .produto-descricao {
+      .produto-descricao {
+        margin-top: 20px;
         font-size: 1rem;
-        color: #6c757d;
+        color: #6a1b9a;
+      }
+      .produto-descricao h6 {
+        font-weight: 600;
+      }
+      .preco {
+        font-size: 2rem;
+        color: #E91E63;
+        font-weight: 700;
         margin-top: 15px;
       }
-      .detalhes-produto .produto-descricao h6 {
-        font-weight: bold;
+      .btn-voltar {
+        background-color: #C2185B;
+        color: #fff;
+        font-size: 1rem;
+        padding: 10px 20px;
+        border-radius: 5px;
       }
+      /* Rodapé */
       footer {
+        background-color: #880E4F;
+        color: #fff;
+        padding: 20px 0;
         text-align: center;
         margin-top: 40px;
-        font-size: 0.9em;
-        color: #888;
+      }
+      footer p, footer a {
+        font-size: 1rem;
+      }
+      footer a {
+        color: #FF80AB;
+        text-decoration: none;
+      }
+      footer a:hover {
+        color: #FFD1DC;
       }
       .modal-content img {
         width: 100%;
-        height: auto;
+        max-height: 600px;
         object-fit: contain;
       }
     </style>
@@ -69,15 +103,17 @@
   <body>
     <!-- Barra de navegação -->
     <nav class="navbar navbar-expand-lg navbar-dark">
-      <a class="navbar-brand" href="/" aria-label="Voltar para a página inicial">
-        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTcoFcbVQ37stOMeVyz_Ym8Ytz941DEQju75g&s" alt="Logo Estilo Musical">
-        Mai Essencias
-      </a>
+      <div class="container">
+        <a class="navbar-brand" href="/" aria-label="Voltar para a página inicial">
+          <img src="{{ informacoes['logo_url'] }}" alt="Logo {{ informacoes['nome_empresa'] }}">
+          {{ informacoes['nome_empresa'] }}
+        </a>
+      </div>
     </nav>
 
-    <!-- Modal -->
+    <!-- Modal para exibir a imagem -->
     <div class="modal fade" id="imagemModal" tabindex="-1" aria-labelledby="imagemModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
+      <div class="modal-dialog modal-lg modal-dialog-centered">
         <div class="modal-content">
           <div class="modal-header">
             <h5 class="modal-title" id="imagemModalLabel">Imagem do Produto</h5>
@@ -90,50 +126,51 @@
       </div>
     </div>
 
+    <!-- Conteúdo do Produto -->
     <div class="container mt-5">
-      <div class="row">
+      <div class="row g-5 align-items-center">
         <div class="col-md-6">
-          <div class="detalhes-produto">
-            <h1>{{ produto['nome'] }}</h1>
-            <p><strong>Código:</strong> {{ produto['codigo'] }}</p>
-            <div class="produto-descricao">
-              <h6><strong>Descrição:</strong></h6>
-              {{ produto.descricaoCurta | safe }}
-            </div>
-            <p><strong>Preço:</strong> R$ {{ '%.2f' % produto['preco'] }}</p>
-            <p><strong>Estoque:</strong> {{ produto['estoque']['saldoVirtualTotal'] }} unidades</p>
-          </div>
-          <a href="/" class="btn btn-secondary mb-3">Voltar ao Catálogo</a>
-
-        </div>
-        <div class="col-md-6">
-          {% if produto['imagemURL'] %}
+          {% if produto.imagemURL %}
             <a href="#" data-bs-toggle="modal" data-bs-target="#imagemModal">
-              <img src="{{ produto['imagemURL'] }}" alt="{{ produto['nome'] }}" class="produto-imagem" id="imagemProdutoThumbnail">
+              <img src="{{ produto.imagemURL }}" alt="{{ produto.nome }}" class="produto-imagem" id="imagemProdutoThumbnail">
             </a>
           {% else %}
             <img src="https://www.jundplay.com.br/lib/img/imagem-nao-disponivel.jpg" alt="Imagem não disponível" class="produto-imagem">
           {% endif %}
         </div>
+        <div class="col-md-6">
+          <div class="detalhes-produto">
+            <h1>{{ produto.nome }}</h1>
+            <p><strong>Código:</strong> {{ produto.codigo }}</p>
+            <div class="produto-descricao">
+              <h6>Descrição:</h6>
+              {{ produto.descricaoCurta | safe }}
+            </div>
+            <p class="preco">R$ {{ '%.2f' % produto.preco }}</p>
+            <p><strong>Estoque:</strong> {{ produto.estoque.saldoVirtualTotal }} unidades</p>
+            <a href="/" class="btn btn-voltar mt-3">Voltar ao Catálogo</a>
+          </div>
+        </div>
       </div>
     </div>
+
+    <!-- Rodapé -->
     <footer>
-      <p>&copy; 2025 Mai Essencias</p>
+      <div class="container">
+        <p>&copy; 2025 {{ informacoes['nome_empresa'] }}</p>
+        <p>{{ informacoes['endereco'] }}</p>
+        <p><a href="tel:+{{ informacoes['whats'] }}">{{ informacoes['whats'] }}</a></p>
+      </div>
     </footer>
 
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script>
-      // Obtém a referência da imagem da miniatura
+      // Exibe a imagem do produto no modal quando a miniatura for clicada
       const imagemThumbnail = document.getElementById('imagemProdutoThumbnail');
-      // Obtém a referência da imagem no modal
       const imagemModal = document.getElementById('imagemProduto');
-
-      // Adiciona um ouvinte de evento de clique à miniatura
       imagemThumbnail.addEventListener('click', function(event) {
-        // Previne o comportamento padrão do link
         event.preventDefault();
-        // Define o src da imagem no modal para o src da miniatura
         imagemModal.src = imagemThumbnail.src;
       });
     </script>

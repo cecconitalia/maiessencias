@@ -2,30 +2,40 @@
 <html lang="pt-BR">
   <head>
     <meta charset="utf-8">
-    <title>Catálogo de Produtos - Estilo Musical</title>
+    <title>Catálogo de Produtos - Mai Essencias </title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Bootstrap 5 CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
       body {
-        background-color: #f0f0f0; /* Cor de fundo */
+        background-color: #f0f0f0;
       }
       .navbar {
-        background-color: #000000; /* Cor da barra de navegação */
+        background-color: #000000;
       }
       .navbar-brand img {
         width: 50px;
         height: auto;
       }
       .navbar-brand {
-        color: #FFD700; /* Cor amarela para "Estilo Musical" */
+        color: #FFD700;
       }
       .navbar-brand:hover {
-        color: #FFDD44; /* Cor amarela mais suave ao passar o mouse */
+        color: #FFDD44;
+      }
+      .navbar-nav .nav-link {
+        color: #fff;
+      }
+      .navbar-nav .nav-link:hover {
+        color: #FFD700;
+      }
+      .navbar-nav .nav-item {
+        margin-right: 15px;
       }
       .produto-card {
         margin-bottom: 20px;
         transition: transform 0.2s ease-in-out;
+        position: relative;
       }
       .produto-card:hover {
         transform: scale(1.02);
@@ -36,17 +46,6 @@
         object-fit: contain;
         border-radius: 8px 8px 0 0;
         cursor: pointer;
-      }
-      .galeria-imagem {
-        width: 100%;
-        height: 100px;
-        object-fit: contain;
-        margin: 5px;
-        cursor: pointer;
-        border-radius: 8px;
-      }
-      .galeria-imagem:hover {
-        opacity: 0.8;
       }
       .card-body {
         padding: 15px;
@@ -62,15 +61,52 @@
       .card-text {
         font-size: 1rem;
       }
+      .btn-custom {
+        font-size: 14px;
+        padding: 8px 16px;
+        border-radius: 25px;
+        width: 100%;
+      }
+      .whatsapp-btn {
+        background-color: #25D366;
+        color: white;
+        font-size: 14px;
+        padding: 8px 16px;
+        border-radius: 25px;
+        display: inline-flex;
+        align-items: center;
+        justify-content: center;
+        text-decoration: none;
+      }
+      .whatsapp-btn i {
+        font-size: 18px;
+        margin-right: 8px;
+      }
+      .btn-group {
+        display: flex;
+        justify-content: space-between;
+        gap: 10px;
+        margin-top: 10px;
+      }
     </style>
   </head>
   <body>
-    <!-- Barra de navegação com logo e busca -->
+    <!-- Barra de navegação -->
     <nav class="navbar navbar-expand-lg navbar-light">
       <a class="navbar-brand" href="/" aria-label="Voltar para a página inicial">
-        <img src="https://scontent.fmxp9-2.fna.fbcdn.net/v/t39.30808-6/448020429_441447745303078_6648644685849405109_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=jrqdElGhlbUQ7kNvgFks8cR&_nc_zt=23&_nc_ht=scontent.fmxp9-2.fna&_nc_gid=AmGvGuCChFvuLQz0AfeSzGW&oh=00_AYDZQlJW9XdCopORUKSGGUhkjcKguP8Hzhk_XYw6LvgKXA&oe=67A3D248" alt="Logo Estilo Musical">
-        Estilo Musical
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTcoFcbVQ37stOMeVyz_Ym8Ytz941DEQju75g&s" alt="Logo Estilo Musical">
+        Mai Essencias
       </a>
+      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Alternar navegação">
+        <span class="navbar-toggler-icon"></span>
+      </button>
+      <div class="collapse navbar-collapse" id="navbarNav">
+        <ul class="navbar-nav ms-auto">
+          <li class="nav-item">
+            <a class="nav-link" href="#">Áudio e Instrumentos Musicais</a>
+          </li>
+        </ul>
+      </div>
       <!-- Formulário de busca -->
       <form class="d-flex" method="GET" action="/">
         <input class="form-control me-2" type="search" placeholder="Buscar produto" aria-label="Buscar" name="search" value="{{ request.args.get('search', '') }}">
@@ -81,101 +117,73 @@
     <div class="container mt-4">
       <h1 class="mb-4 text-center">Catálogo de Produtos</h1>
       <div class="row">
-        {% if produtos %}
-          {% for produto in produtos %}
-            <div class="col-md-4">
-              <div class="card produto-card shadow-sm">
-                <!-- Exibição da imagem principal -->
-                {% if produto.imagemURL %}
-                  <img src="{{ produto.imagemURL }}" alt="{{ produto.descricaoCurta if produto.descricaoCurta else produto.nome }}" class="produto-imagem" onclick="abrirModal('{{ produto.imagemURL }}')">
-                {% else %}
-                  <img src="https://www.jundplay.com.br/lib/img/imagem-nao-disponivel.jpg" alt="Imagem não disponível" class="produto-imagem">
-                {% endif %}
-                <div class="card-body">
-                  <p><span id="descricaoProduto">{{ produto.nome }}</span></p>
-                  <h6 class="card-subtitle mb-2 text-muted">
-                    Código: {{ produto.codigo if produto.codigo else 'N/A' }}
-                  </h6>
-                  <p class="card-text">
-                    <strong>Preço:</strong> <span class="preco" id="precoProduto{{ loop.index }}"></span>
-                  </p>
-                  <!-- Botão para redirecionar para a página produto.html -->
-                  <button class="btn btn-primary" onclick="window.location.href='/produto/{{ produto.codigo }}'">Ver Descrição</button>
+        {% for produto in produtos %}
+          <div class="col-md-4">
+            <div class="card produto-card shadow-sm">
+              {% if produto.imagemURL %}
+                <a href="#" data-bs-toggle="modal" data-bs-target="#imagemModal{{ loop.index }}">
+                  <img src="{{ produto.imagemURL }}" alt="{{ produto.nome }}" class="produto-imagem" id="imagemProdutoThumbnail{{ loop.index }}">
+                </a>
+              {% else %}
+                <img src="https://www.jundplay.com.br/lib/img/imagem-nao-disponivel.jpg" alt="Imagem não disponível" class="produto-imagem">
+              {% endif %}
+              <div class="card-body">
+                <h5 class="card-title">{{ produto.nome }}</h5>
+                <h6 class="card-subtitle mb-2 text-muted">Código: {{ produto.codigo }}</h6>
+                <p class="card-text"><strong>Preço:</strong> {{ produto.preco | brl }}</p>
+                <p class="card-text">
+                  <strong>Status:</strong>
+                  {% if produto['estoque']['saldoVirtualTotal'] > 0 %}
+                    <span class="badge bg-success text-white">Disponível</span>
+                  {% else %}
+                    <span class="badge bg-warning text-dark">Sob encomenda</span>
+                  {% endif %}
+                </p>
+
+                <div class="btn-group">
+                  <button class="btn btn-primary btn-custom" onclick="window.location.href='/produto/{{ produto.codigo }}'">Ver Descrição</button>
+                  <a href="https://wa.me/5549999389426?text=Tenho%20interesse%20em%20comprar%20esse%20produto%20{{ produto.nome }}%20-%20{{ produto.codigo }}%20-%20https://estilomusical.onrender.com/produto/{{ produto.codigo }}" class="whatsapp-btn">
+                    <i class="bi-whatsapp"></i> Whats
+                  </a>
                 </div>
               </div>
             </div>
-          {% endfor %}
-        {% else %}
-          <p class="text-center">Nenhum produto encontrado.</p>
-        {% endif %}
-      </div>
-    </div>
+          </div>
 
-    <!-- Modal para mostrar a imagem grande -->
-    <div class="modal fade" id="imagemModal" tabindex="-1" aria-labelledby="imagemModalLabel" aria-hidden="true">
-      <div class="modal-dialog modal-lg">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="imagemModalLabel">Imagem do Produto</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
+          <!-- Modal da Imagem do Produto -->
+          <div class="modal fade" id="imagemModal{{ loop.index }}" tabindex="-1" aria-labelledby="imagemModalLabel{{ loop.index }}" aria-hidden="true">
+            <div class="modal-dialog">
+              <div class="modal-content">
+                <div class="modal-header">
+                  <h5 class="modal-title" id="imagemModalLabel{{ loop.index }}">Imagem do Produto</h5>
+                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+                </div>
+                <div class="modal-body">
+                  <img src="{{ produto.imagemURL }}" alt="{{ produto.nome }}" class="img-fluid" id="imagemProdutoModal{{ loop.index }}">
+                </div>
+              </div>
+            </div>
           </div>
-          <div class="modal-body text-center">
-            <img id="imagemModalSrc" src="" alt="Imagem Grande" class="img-fluid">
-          </div>
-        </div>
-      </div>
-    </div>
 
-    <!-- Modal para mostrar a descrição completa -->
-    <div class="modal fade" id="descricaoModal" tabindex="-1" aria-labelledby="descricaoModalLabel" aria-hidden="true">
-      <div class="modal-dialog">
-        <div class="modal-content">
-          <div class="modal-header">
-            <h5 class="modal-title" id="descricaoModalLabel">Descrição do Produto</h5>
-            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
-          </div>
-          <div class="modal-body" id="descricaoModalBody">
-            <!-- Descrição será inserida aqui -->
-          </div>
-        </div>
+        {% endfor %}
       </div>
+
+      <!-- Paginação -->
+      {% if total_paginas > 1 %}
+        <nav aria-label="Navegação de páginas">
+          <ul class="pagination justify-content-center">
+            {% for p in range(1, total_paginas + 1) %}
+              <li class="page-item {% if p == pagina %}active{% endif %}">
+                <a class="page-link" href="?pagina={{ p }}&search={{ request.args.get('search', '') }}">{{ p }}</a>
+              </li>
+            {% endfor %}
+          </ul>
+        </nav>
+      {% endif %}
     </div>
 
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-    <script>
-      // Função para formatar o preço como Real Brasileiro
-      function formatarPreco(preco) {
-        const formatter = new Intl.NumberFormat('pt-BR', {
-          style: 'currency',
-          currency: 'BRL'
-        });
-        return formatter.format(preco);
-      }
 
-      // Função para abrir o modal com a imagem grande
-      function abrirModal(imagemUrl) {
-        const modal = new bootstrap.Modal(document.getElementById('imagemModal'));
-        const modalImg = document.getElementById('imagemModalSrc');
-        modalImg.src = imagemUrl;
-        modal.show();
-      }
-
-      // Função para exibir a descrição completa no modal
-      function mostrarDescricao(descricao) {
-        const modal = new bootstrap.Modal(document.getElementById('descricaoModal'));
-        const modalBody = document.getElementById('descricaoModalBody');
-        modalBody.innerHTML = descricao;  // Adiciona a descrição ao corpo do modal
-        modal.show();  // Exibe o modal
-      }
-
-      // Formatar e exibir os preços dos produtos
-      document.addEventListener("DOMContentLoaded", function() {
-        {% for produto in produtos %}
-          const precoProduto{{ loop.index }} = {{ produto.preco }};
-          document.getElementById("precoProduto{{ loop.index }}").textContent = formatarPreco(precoProduto{{ loop.index }});
-        {% endfor %}
-      });
-    </script>
   </body>
 </html>

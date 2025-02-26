@@ -1,0 +1,41 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Lista de Contatos</title>
+</head>
+<body>
+    <h1>Lista de Contatos</h1>
+    
+    {% if contatos %}
+        <table>
+            <thead>
+                <tr>
+                    <th>ID</th>
+                    <th>Nome</th>
+                    <th>Email</th>
+                    <th>Telefone</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for contato in contatos %}
+                    <tr>
+                        <td>{{ contato.id }}</td>
+                        <td>{{ contato.nome }}</td>
+                        <td>{{ contato.email }}</td>
+                        <td>{{ contato.telefone }}</td>
+                    </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+
+        <div>
+            <span> Página {{ pagina }} de {{ total_paginas }} </span>
+            <a href="?pagina={{ pagina + 1 }}">Próxima página</a>
+        </div>
+    {% else %}
+        <p>Nenhum contato encontrado.</p>
+    {% endif %}
+</body>
+</html>

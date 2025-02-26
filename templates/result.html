@@ -1,0 +1,57 @@
+<!DOCTYPE html>
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Detalhes do Produto</title>
+</head>
+<body>
+    <h1>Detalhes do Produto</h1>
+    
+    <h2>Informações Gerais</h2>
+    <ul>
+        <li><strong>ID:</strong> {{ produto.id }}</li>
+        <li><strong>Nome:</strong> {{ produto.nome }}</li>
+        <li><strong>Código:</strong> {{ produto.codigo }}</li>
+        <li><strong>Preço:</strong> {{ produto.preco | brl }}</li>
+        <li><strong>Tipo:</strong> {{ produto.tipo }}</li>
+        <li><strong>Situação:</strong> {{ produto.situacao }}</li>
+        <li><strong>Formato:</strong> {{ produto.formato }}</li>
+        <li><strong>Descrição Curta:</strong> {{ produto.descricaoCurta }}</li>
+        <li><strong>Imagem:</strong> <img src="{{ produto.imagemURL }}" alt="{{ produto.nome }}"></li>
+    </ul>
+    
+    <h2>Detalhes</h2>
+    <ul>
+        <li><strong>Estoque:</strong> {{ produto.detalhes.estoque }}</li>
+        <li><strong>Fornecedor:</strong> {{ produto.detalhes.fornecedor }}</li>
+        <li><strong>Dimensões:</strong> {{ produto.detalhes.dimensoes }}</li>
+        <li><strong>Tributação:</strong> {{ produto.detalhes.tributacao }}</li>
+        <li><strong>Estrutura:</strong> {{ produto.detalhes.estrutura }}</li>
+        <li><strong>Mídia:</strong> {{ produto.detalhes.midia }}</li>
+    </ul>
+
+    <h2>Campos Personalizados</h2>
+    <ul>
+        <li><strong>Linha do Produto:</strong> {{ produto.custom_fields.linhaProduto }}</li>
+        <li><strong>Categoria:</strong> {{ produto.custom_fields.categoria }}</li>
+    </ul>
+
+    <h2>Metadados</h2>
+    <ul>
+        <li><strong>Data de Validade:</strong> {{ produto.metadata.dataValidade }}</li>
+        <li><strong>GTIN:</strong> {{ produto.metadata.gtin }}</li>
+        <li><strong>Marca:</strong> {{ produto.metadata.marca }}</li>
+        <li><strong>Link Externo:</strong> <a href="{{ produto.metadata.linkExterno }}" target="_blank">Visitar</a></li>
+        <li><strong>Observações:</strong> {{ produto.metadata.observacoes }}</li>
+    </ul>
+
+    <h2>Campos Opcionais</h2>
+    <ul>
+        <li><strong>Peso Líquido:</strong> {{ produto.pesoLiquido }}</li>
+        <li><strong>Peso Bruto:</strong> {{ produto.pesoBruto }}</li>
+        <li><strong>Volumes:</strong> {{ produto.volumes }}</li>
+        <li><strong>Itens por Caixa:</strong> {{ produto.itensPorCaixa }}</li>
+    </ul>
+</body>
+</html>

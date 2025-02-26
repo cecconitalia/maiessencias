@@ -2,14 +2,14 @@
 <html lang="pt-BR">
   <head>
     <meta charset="utf-8">
-    <title>{{ produto.nome }} - Detalhes</title>
+    <title>{{ produto['nome'] }}</title>
     <meta name="viewport" content="width=device-width, initial-scale=1">
     <!-- Bootstrap 5 CDN -->
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <style>
       body {
-        background-color: #f9f9f9;
-        font-family: 'Arial', sans-serif;
+        background-color: #f8f9fa;
+        font-family: Arial, Helvetica, sans-serif;
       }
       .navbar {
         background-color: #000000;
@@ -19,111 +19,123 @@
         height: auto;
       }
       .navbar-brand {
-        color: #fdd835 !important;
-        font-weight: bold;
-        font-size: 1.25rem;
+        color: #FFD700;
+      }
+      .navbar-brand:hover {
+        color: #FFDD44;
       }
       .produto-imagem {
         width: 100%;
-        height: 400px;
+        height: auto;
         object-fit: contain;
-        border-radius: 12px;
-        box-shadow: 0 4px 10px rgba(0, 0, 0, 0.1);
-        transition: transform 0.3s ease-in-out;
+        border-radius: 8px;
+        cursor: pointer;
       }
-      .produto-imagem:hover {
-        transform: scale(1.05);
+      .detalhes-produto {
+        background-color: white;
+        border-radius: 8px;
+        padding: 20px;
+        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
       }
-      .card {
-        border: none;
-        box-shadow: 0 6px 12px rgba(0, 0, 0, 0.1);
-        border-radius: 12px;
-        background-color: #ffffff;
-        transition: transform 0.2s ease;
+      .detalhes-produto h1 {
+        font-size: 2rem;
+        color: #343a40;
       }
-      .card:hover {
-        transform: translateY(-5px);
+      .detalhes-produto p {
+        font-size: 1rem;
+        color: #495057;
       }
-      .card-body {
-        padding: 30px;
-      }
-      .card-title {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: #333;
-      }
-      .card-subtitle {
+      .detalhes-produto .produto-descricao {
         font-size: 1rem;
         color: #6c757d;
-      }
-      .produto-preco {
-        font-size: 1.5rem;
-        font-weight: bold;
-        color: #28a745;
         margin-top: 15px;
       }
-      .descricao {
-        font-size: 1.125rem;
-        color: #444;
-        margin-top: 15px;
-        line-height: 1.6;
-      }
-      .btn-custom {
-        background-color: #fdd835;
-        border: none;
-        color: #fff;
-        border-radius: 50px;
-        padding: 12px 30px;
+      .detalhes-produto .produto-descricao h6 {
         font-weight: bold;
-        font-size: 1rem;
-        transition: background-color 0.3s ease;
       }
-      .btn-custom:hover {
-        background-color: #c8a000;
-      }
-      .container {
+      footer {
+        text-align: center;
         margin-top: 40px;
+        font-size: 0.9em;
+        color: #888;
+      }
+      .modal-content img {
+        width: 100%;
+        height: auto;
+        object-fit: contain;
       }
     </style>
   </head>
   <body>
-    <!-- Barra de navegação com logo e busca -->
-    <nav class="navbar navbar-expand-lg navbar-light">
-      <a class="navbar-brand" href="/">
-        <img src="https://scontent.fmxp9-2.fna.fbcdn.net/v/t39.30808-6/448020429_441447745303078_6648644685849405109_n.jpg?_nc_cat=107&ccb=1-7&_nc_sid=6ee11a&_nc_ohc=jrqdElGhlbUQ7kNvgFks8cR&_nc_zt=23&_nc_ht=scontent.fmxp9-2.fna&_nc_gid=AmGvGuCChFvuLQz0AfeSzGW&oh=00_AYDZQlJW9XdCopORUKSGGUhkjcKguP8Hzhk_XYw6LvgKXA&oe=67A3D248" alt="Logo Estilo Musical">
-        Estilo Musical
+    <!-- Barra de navegação -->
+    <nav class="navbar navbar-expand-lg navbar-dark">
+      <a class="navbar-brand" href="/" aria-label="Voltar para a página inicial">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTcoFcbVQ37stOMeVyz_Ym8Ytz941DEQju75g&s" alt="Logo Estilo Musical">
+        Mai Essencias
       </a>
     </nav>
 
-    <div class="container">
-      <div class="row">
-        <div class="col-md-6">
-          <!-- Exibição da imagem principal -->
-          <img src="{{ produto.imagemURL }}" alt="{{ produto.nome }}" class="produto-imagem">
-        </div>
-        <div class="col-md-6">
-          <div class="card">
-            <div class="card-body">
-              <h5 class="card-title">{{ produto.nome }}</h5>
-              <p class="card-subtitle">
-                <strong>Código:</strong> {{ produto.codigo if produto.codigo else 'N/A' }}<br>
-              </p>
-              <p class="produto-preco">
-                <strong>Preço:</strong> {{ produto.preco | formatarPreco }}
-              </p>
-              <div class="descricao">
-                <strong>Descrição:</strong> <br>
-                {{ produto.descricaoCurta | safe }}
-              </div>
-              <!-- Botão "Voltar" para voltar à página de listagem -->
-              <a href="/" class="btn-custom mt-4">Voltar</a>
-            </div>
+    <!-- Modal -->
+    <div class="modal fade" id="imagemModal" tabindex="-1" aria-labelledby="imagemModalLabel" aria-hidden="true">
+      <div class="modal-dialog">
+        <div class="modal-content">
+          <div class="modal-header">
+            <h5 class="modal-title" id="imagemModalLabel">Imagem do Produto</h5>
+            <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
+          </div>
+          <div class="modal-body">
+            <img id="imagemProduto" src="" alt="Imagem do Produto" class="img-fluid">
           </div>
         </div>
       </div>
     </div>
 
+    <div class="container mt-5">
+      <div class="row">
+        <div class="col-md-6">
+          <div class="detalhes-produto">
+            <h1>{{ produto['nome'] }}</h1>
+            <p><strong>Código:</strong> {{ produto['codigo'] }}</p>
+            <div class="produto-descricao">
+              <h6><strong>Descrição:</strong></h6>
+              {{ produto.descricaoCurta | safe }}
+            </div>
+            <p><strong>Preço:</strong> R$ {{ '%.2f' % produto['preco'] }}</p>
+            <p><strong>Estoque:</strong> {{ produto['estoque']['saldoVirtualTotal'] }} unidades</p>
+          </div>
+          <a href="/" class="btn btn-secondary mb-3">Voltar ao Catálogo</a>
+
+        </div>
+        <div class="col-md-6">
+          {% if produto['imagemURL'] %}
+            <a href="#" data-bs-toggle="modal" data-bs-target="#imagemModal">
+              <img src="{{ produto['imagemURL'] }}" alt="{{ produto['nome'] }}" class="produto-imagem" id="imagemProdutoThumbnail">
+            </a>
+          {% else %}
+            <img src="https://www.jundplay.com.br/lib/img/imagem-nao-disponivel.jpg" alt="Imagem não disponível" class="produto-imagem">
+          {% endif %}
+        </div>
+      </div>
+    </div>
+    <footer>
+      <p>&copy; 2025 Mai Essencias</p>
+    </footer>
+
     <!-- Bootstrap JS Bundle -->
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Obtém a referência da imagem da miniatura
+      const imagemThumbnail = document.getElementById('imagemProdutoThumbnail');
+      // Obtém a referência da imagem no modal
+      const imagemModal = document.getElementById('imagemProduto');
+
+      // Adiciona um ouvinte de evento de clique à miniatura
+      imagemThumbnail.addEventListener('click', function(event) {
+        // Previne o comportamento padrão do link
+        event.preventDefault();
+        // Define o src da imagem no modal para o src da miniatura
+        imagemModal.src = imagemThumbnail.src;
+      });
+    </script>
   </body>
 </html>

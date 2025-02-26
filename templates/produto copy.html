@@ -1,0 +1,203 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <title>{{ produto.nome }}</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
+    <style>
+      /* ... (mantenha os estilos anteriores) ... */
+      .info-card {
+        background: #fff;
+        border-radius: 8px;
+        padding: 1.5rem;
+        margin-bottom: 1.5rem;
+        box-shadow: 0 2px 4px rgba(0,0,0,0.1);
+      }
+      .carousel-item img {
+        max-height: 500px;
+        object-fit: contain;
+      }
+      .specs-table td {
+        vertical-align: middle;
+      }
+    </style>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg navbar-dark">
+      <a class="navbar-brand" href="/">
+        <img src="https://encrypted-tbn0.gstatic.com/images?q=tbn:ANd9GcTcoFcbVQ37stOMeVyz_Ym8Ytz941DEQju75g&s" alt="Logo">
+        Estilo Musical
+      </a>
+    </nav>
+
+    <div class="container mt-5">
+      <div class="row">
+        <!-- Coluna de Imagens -->
+        <div class="col-md-6">
+          <div class="info-card">
+            {% if produto.detalhes.midia.imagens.externas or produto.detalhes.midia.imagens.internas %}
+              <div id="carouselProduto" class="carousel slide">
+                <div class="carousel-inner">
+                  {% for img in produto.detalhes.midia.imagens.externas %}
+                    <div class="carousel-item {{ 'active' if loop.first }}">
+                      <img src="{{ img.link }}" class="d-block w-100" alt="Imagem externa {{ loop.index }}">
+                    </div>
+                  {% endfor %}
+                  {% for img in produto.detalhes.midia.imagens.internas %}
+                    <div class="carousel-item">
+                      <img src="{{ img.link }}" class="d-block w-100" alt="Imagem interna {{ loop.index }}">
+                    </div>
+                  {% endfor %}
+                </div>
+                <button class="carousel-control-prev" type="button" data-bs-target="#carouselProduto" data-bs-slide="prev">
+                  <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Anterior</span>
+                </button>
+                <button class="carousel-control-next" type="button" data-bs-target="#carouselProduto" data-bs-slide="next">
+                  <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                  <span class="visually-hidden">Próximo</span>
+                </button>
+              </div>
+            {% else %}
+              <img src="https://www.jundplay.com.br/lib/img/imagem-nao-disponivel.jpg" class="img-fluid" alt="Imagem não disponível">
+            {% endif %}
+            
+            {% if produto.detalhes.midia.video %}
+              <div class="mt-3">
+                <h5><i class="bi bi-camera-video"></i> Vídeo</h5>
+                <div class="ratio ratio-16x9">
+                  <iframe src="{{ produto.detalhes.midia.video }}" allowfullscreen></iframe>
+                </div>
+              </div>
+            {% endif %}
+          </div>
+        </div>
+
+        <!-- Detalhes do Produto -->
+        <div class="col-md-6">
+          <div class="info-card">
+            <h1 class="mb-4">{{ produto.nome }}</h1>
+            
+            <div class="row mb-4">
+              <div class="col-md-6">
+                <p class="h3 text-primary">{{ produto.preco|brl }}</p>
+                <p class="text-muted">Código: {{ produto.codigo }}</p>
+              </div>
+              <div class="col-md-6">
+                <div class="alert {{ 'alert-success' if produto.detalhes.estoque.saldoVirtualTotal > 0 else 'alert-danger' }}">
+                  Estoque: {{ produto.detalhes.estoque.saldoVirtualTotal }} unidades
+                </div>
+              </div>
+            </div>
+
+            <h4><i class="bi bi-info-circle"></i> Informações Básicas</h4>
+            <table class="table specs-table">
+              <tbody>
+                <tr>
+                  <td>Marca</td>
+                  <td>{{ produto.metadata.observacoes or 'N/A' }}</td>
+                </tr>
+                <tr>
+                  <td>Validade</td>
+                  <td>{{ produto.metadata.dataValidade or 'N/A' }}</td>
+                </tr>
+                <tr>
+                  <td>GTIN</td>
+                  <td>{{ produto.metadata.gtin or 'N/A' }}</td>
+                </tr>
+                <tr>
+                  <td>Unidade</td>
+                  <td>{{ produto.unidade or 'N/A' }}</td>
+                </tr>
+              </tbody>
+            </table>
+
+            <h4 class="mt-4"><i class="bi bi-box-seam"></i> Dimensões</h4>
+            <table class="table specs-table">
+              <tbody>
+                <tr>
+                  <td>Largura</td>
+                  <td>{{ produto.detalhes.dimensoes.largura }} cm</td>
+                </tr>
+                <tr>
+                  <td>Altura</td>
+                  <td>{{ produto.detalhes.dimensoes.altura }} cm</td>
+                </tr>
+                <tr>
+                  <td>Profundidade</td>
+                  <td>{{ produto.detalhes.dimensoes.profundidade }} cm</td>
+                </tr>
+                <tr>
+                  <td>Peso Bruto</td>
+                  <td>{{ produto.pesoBruto }} kg</td>
+                </tr>
+              </tbody>
+            </table>
+          </div>
+
+          <!-- Fornecedor e Custom Fields -->
+          <div class="info-card">
+            {% if produto.detalhes.fornecedor %}
+              <h4><i class="bi bi-truck"></i> Fornecedor</h4>
+              <p>{{ produto.detalhes.fornecedor.contato.nome }}<br>
+              Código: {{ produto.detalhes.fornecedor.codigo }}<br>
+              Preço Custo: {{ produto.detalhes.fornecedor.precoCusto|brl }}</p>
+            {% endif %}
+
+            {% if produto.custom_fields.camposCustomizados %}
+              <h4><i class="bi bi-tags"></i> Especificações</h4>
+              <div class="row">
+                {% for campo in produto.custom_fields.camposCustomizados %}
+                  <div class="col-md-6 mb-2">
+                    <strong>{{ campo.idCampoCustomizado }}:</strong> {{ campo.valor }}
+                  </div>
+                {% endfor %}
+              </div>
+            {% endif %}
+          </div>
+        </div>
+      </div>
+
+      <!-- Variações -->
+      {% if produto.variacoes %}
+        <div class="info-card mt-4">
+          <h3><i class="bi bi-collection"></i> Variações</h3>
+          <div class="row row-cols-1 row-cols-md-3 g-4">
+            {% for variacao in produto.variacoes %}
+              <div class="col">
+                <div class="card h-100">
+                  <div class="card-body">
+                    <h5 class="card-title">{{ variacao.nome }}</h5>
+                    <p class="card-text">
+                      Código: {{ variacao.codigo }}<br>
+                      Preço: {{ variacao.preco|brl }}<br>
+                      Estoque: {{ variacao.estoque.saldoVirtualTotal }}
+                    </p>
+                  </div>
+                </div>
+              </div>
+            {% endfor %}
+          </div>
+        </div>
+      {% endif %}
+
+      <div class="text-center mt-4">
+        <a href="/" class="btn btn-secondary btn-lg"><i class="bi bi-arrow-left"></i> Voltar ao Catálogo</a>
+      </div>
+    </div>
+
+    <footer class="mt-5">
+      <p>&copy; 2025 Estilo Musical</p>
+    </footer>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Inicializa o carrossel
+      const carousel = new bootstrap.Carousel('#carouselProduto', {
+        interval: 5000
+      })
+    </script>
+  </body>
+</html>

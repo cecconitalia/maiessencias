@@ -1,8 +1,11 @@
 {
-    "nome_empresa": "Mai Essencias",
-    "logo_url": "https://scontent.cdninstagram.com/v/t51.2885-19/317359829_1550031355496962_4146066775778405728_n.jpg?stp=cp0_dst-jpg_s110x80_tt6&_nc_cat=103&ccb=1-7&_nc_sid=bf7eb4&_nc_ohc=cnWZqk4QjSsQ7kNvgGjqutG&_nc_oc=Adg-BNqyB_0UXazKJLYY_h4FND9Qhj5XyJU5Cz4R3ZtwVCN5a8p6W3k2As1BSLL8VBo&_nc_zt=24&_nc_ht=scontent.cdninstagram.com&oh=00_AYCM6UBCBObPm-HQzY-8Uc7PTZ127PbjWq-BGxd_nb__1w&oe=67C50EAC",
-    "frase_logo": "Essencias e Aromas",
-    "endereco": "Rua Sao Salvador, 2525 , Sala 02, Centro - Pinhalzinho SC",
-    "whats": "+554999389426"
-  }
-  
+  "nome_empresa": "Mai Ess\u00eancias",
+  "title": "Mai Essencias",
+  "logo_url": "/static/images/logo.png",
+  "frase_logo": "Ess\u00eancias e Aromas",
+  "endereco": "Rua S\u00e3o Salvador, 2525 , Sala 02, Centro - Pinhalzinho SC",
+  "whats": "+554999389426",
+  "facebook_url": "https://facebook.com/mai_essencias",
+  "instagram_url": "https://instagram.com/mai_essencias",
+  "youtube_url": "https://youtube.com/viaaroma"
+}

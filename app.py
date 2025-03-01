@@ -285,52 +285,53 @@ def index():
     # Lista das palavras para filtrar
     palavras = ["essencia", "aromat", "sache", "oleo", "agua", "difus", "home", "perf", "hidro"]
 
-    # Obtém todos os produtos (pode ser mais de 100)
+    # Obtém todos os produtos
     produtos = bling_api.get_all_products()
 
-    # Filtra os produtos removendo acentos do nome antes da busca
+    # Filtra os produtos mantendo as palavras-chave
     produtos_filtrados = [
         produto for produto in produtos
         if any(palavra in unidecode(produto.get('nome', '').lower()) for palavra in palavras)
     ]
 
-    # Ordena os produtos inicialmente por nome (ordem alfabética)
+    # Garante que sempre haja produtos (caso o filtro retorne vazio, mostra todos)
+    if not produtos_filtrados:
+        produtos_filtrados = produtos  # Fallback para todos os produtos
+
+    # Ordenação inicial alfabética
     produtos_ordenados = sorted(produtos_filtrados, key=lambda p: unidecode(p.get('nome', '').lower()))
 
     message = None
     produtos_sugestoes = []
 
     if search_query:
-        # Filtra os produtos comparando a busca normalizada (sem acentos)
-        produtos_filtrados = [
+        # Filtra os produtos pela busca
+        produtos_filtrados_busca = [
             produto for produto in produtos_ordenados
             if search_query_normalized in unidecode(produto.get('nome', '').lower())
         ]
 
-        if not produtos_filtrados:
-            message = "Ops, parece que não encontramos nada :( "
-
-            # Sugere até 6 produtos aleatórios para mostrar como sugestão
+        if not produtos_filtrados_busca:
+            message = "Ops, parece que não encontramos nada :("
             produtos_sugestoes = random.sample(produtos_ordenados, min(6, len(produtos_ordenados)))
-
         else:
-            produtos_filtrados = sorted(
-                produtos_filtrados,
-                key=lambda p: p.get('estoque', {}).get('saldoVirtualTotal', 0),
-                reverse=True
-            )
-            produtos_filtrados = sorted(
-                produtos_filtrados,
-                key=lambda p: unidecode(p.get('nome', '').lower()).find(search_query_normalized)
+            # Ordena por relevância (estoque + posição do termo)
+            produtos_filtrados_busca = sorted(
+                produtos_filtrados_busca,
+                key=lambda p: (
+                    -p.get('estoque', {}).get('saldoVirtualTotal', 0),
+                    unidecode(p.get('nome', '').lower()).find(search_query_normalized)
+                )
             )
 
-        produtos_ordenados = produtos_filtrados
+        produtos_ordenados = produtos_filtrados_busca
 
     else:
-        # Embaralha os produtos apenas quando não há busca
-        random.shuffle(produtos_ordenados)
+        # Embaralha os produtos apenas na primeira página (sem busca)
+        if request.args.get('pagina', 1) == 1:
+            random.shuffle(produtos_ordenados)
 
-    # Paginação para a interface (exibindo 30 produtos por página)
+    # Paginação
     produtos_por_pagina_ui = 30
     pagina = request.args.get('pagina', 1, type=int)
     total_produtos = len(produtos_ordenados)
@@ -349,8 +350,6 @@ def index():
         produtos_sugestoes=produtos_sugestoes,
         informacoes=informacoes
     )
-
-
 
 @app.route('/produto/<codigo>')
 @handle_api_errors

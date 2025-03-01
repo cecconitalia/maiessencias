@@ -1,7 +1,7 @@
 :root {
   --primary-color: #EE82EE;
   --secondary-color: #320034;
-  --accent-color: #FFD700;
+  --accent-color: #320034;
 }
 
 body {
@@ -71,6 +71,17 @@ body {
 .header-search button {
   padding: 0.5rem; /* Ajuste do padding do botão de pesquisa */
 }
+
+.btn-warning {
+  background-color: #ffffff;
+  border-color: #320034;
+}
+
+.btn-warning:hover {
+  background-color: #ffffff; /* Um tom mais claro para o hover */
+  border-color: #4b003f;
+}
+
 
 .user-menu .nav-link {
   color: white !important;

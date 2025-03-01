@@ -284,7 +284,7 @@ def index():
 
     # Lista das palavras para filtrar
     palavras = ["essencia", "aromat", "sache", "oleo", "agua", "difus", "home", "perf", "hidro"]
-    
+
     # Obtém todos os produtos (pode ser mais de 100)
     produtos = bling_api.get_all_products()
 
@@ -298,14 +298,21 @@ def index():
     produtos_ordenados = sorted(produtos_filtrados, key=lambda p: unidecode(p.get('nome', '').lower()))
 
     message = None
+    produtos_sugestoes = []
+
     if search_query:
         # Filtra os produtos comparando a busca normalizada (sem acentos)
         produtos_filtrados = [
             produto for produto in produtos_ordenados
             if search_query_normalized in unidecode(produto.get('nome', '').lower())
         ]
+
         if not produtos_filtrados:
-            message = f"Nenhum produto encontrado para '{search_query}'."
+            message = "Ops, parece que não encontramos nada :( "
+
+            # Sugere até 6 produtos aleatórios para mostrar como sugestão
+            produtos_sugestoes = random.sample(produtos_ordenados, min(6, len(produtos_ordenados)))
+
         else:
             produtos_filtrados = sorted(
                 produtos_filtrados,
@@ -316,7 +323,9 @@ def index():
                 produtos_filtrados,
                 key=lambda p: unidecode(p.get('nome', '').lower()).find(search_query_normalized)
             )
+
         produtos_ordenados = produtos_filtrados
+
     else:
         # Embaralha os produtos apenas quando não há busca
         random.shuffle(produtos_ordenados)
@@ -337,8 +346,10 @@ def index():
         pagina=pagina,
         total_paginas=total_paginas,
         message=message,
+        produtos_sugestoes=produtos_sugestoes,
         informacoes=informacoes
     )
+
 
 
 @app.route('/produto/<codigo>')

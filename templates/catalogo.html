@@ -78,108 +78,69 @@
 
 
     <!-- Conteúdo Principal -->
-    <main id="main-content" class="container my-5" role="main">
-        <h1 class="visually-hidden">Catálogo de produtos {{ informacoes['nome_empresa'] | tojson | safe }}</h1>
-        
-        <div class="row">
-            <div class="col-12">
-                <section aria-labelledby="produtos-title">
-                    <h2 id="produtos-title" class="h4 mb-4 text-center">Nossos Produtos</h2>
+<main id="main-content" class="container my-5" role="main">
+    <h1 class="visually-hidden">Catálogo de produtos {{ informacoes['nome_empresa'] | tojson | safe }}</h1>
+    
+    <div class="row">
+        <div class="col-12">
+            <section aria-labelledby="produtos-title">
+                <h2 id="produtos-title" class="h4 mb-4 text-center">Nossos Produtos</h2>
 
-                    <!-- Mensagem de Feedback para Busca -->
-                    {% if message %}
-                    <div class="alert alert-info" role="alert">
-                        {{ message }}
-                    </div>
-                    {% endif %}
-                    
-                    <div class="product-grid">
-                        {% for produto in produtos %}
-                        <article class="product-card" itemscope itemtype="http://schema.org/Product">
-                            {% if produto['estoque']['saldoVirtualTotal'] > 0 %}
-                                <span class="product-badge" aria-hidden="true">Disponível</span>
-                            {% else %}
-                                <span class="product-badge bg-secondary" aria-hidden="true">Sob Encomenda</span>
-                            {% endif %}
-                            
-                            <!-- Imagem do Produto com Trigger para o Modal -->
-                            <div class="product-image-container" 
-                                 data-bs-toggle="modal" 
-                                 data-bs-target="#modalImagem{{ loop.index }}"
-                                 role="button"
-                                 aria-label="Ampliar imagem do produto {{ produto.nome }}">
-                                <img src="{{ produto.imagemURL or '/static/images/placeholder.png' }}" 
-                                     class="product-image" 
-                                     alt="{{ produto.nome }}" 
-                                     loading="lazy"
-                                     width="300"
-                                     height="200"
-                                     itemprop="image">
+                <!-- Mensagem de Feedback para Busca -->
+                {% if message %}
+                <div class="alert alert-info" role="alert">
+                    {{ message }}
+                </div>
+                {% endif %}
+                
+                <div class="product-grid">
+                    {% for produto in produtos %}
+                    <article class="product-card" itemscope itemtype="http://schema.org/Product">
+                        {% if produto['estoque']['saldoVirtualTotal'] > 0 %}
+                            <span class="product-badge" aria-hidden="true">Disponível</span>
+                        {% else %}
+                            <span class="product-badge bg-secondary" aria-hidden="true">Sob Encomenda</span>
+                        {% endif %}
+                        
+                        <!-- Imagem do Produto agora redireciona para a página de detalhes -->
+                        <a href="/produto/{{ produto.codigo }}" 
+                           class="product-image-container"
+                           aria-label="Ver detalhes do produto {{ produto.nome }}">
+                            <img src="{{ produto.imagemURL or '/static/images/placeholder.png' }}" 
+                                 class="product-image" 
+                                 alt="{{ produto.nome }}" 
+                                 loading="lazy"
+                                 width="300"
+                                 height="200"
+                                 itemprop="image">
+                        </a>
+                        
+                        <div class="product-info">
+                            <div>
+                                <h3 class="product-title" itemprop="name">{{ produto.nome }}</h3>
+                                <div class="product-price" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+                                    <meta itemprop="priceCurrency" content="BRL">
+                                    <span itemprop="price">{{ produto.preco | brl }}</span>
+                                </div>
+                                <small class="product-code">Cód: <span itemprop="sku">{{ produto.codigo }}</span></small>
                             </div>
-                            
-                            <div class="product-info">
-                                <div>
-                                    <h3 class="product-title" itemprop="name">{{ produto.nome }}</h3>
-                                    <div class="product-price" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
-                                        <meta itemprop="priceCurrency" content="BRL">
-                                        <span itemprop="price">{{ produto.preco | brl }}</span>
-                                    </div>
-                                    <small class="product-code">Cód: <span itemprop="sku">{{ produto.codigo }}</span></small>
-                                </div>
-                                <div class="product-actions">
-                                    <a href="/produto/{{ produto.codigo }}" 
-                                       class="btn btn-outline-primary btn-product"
-                                       aria-label="Ver detalhes do produto {{ produto.nome }}">
-                                        <i class="fas fa-eye"></i> Detalhes
-                                    </a>
-                                    <button class="btn btn-violet btn-product" 
-                                    aria-label="Comprar {{ produto.nome }}" 
-                                    onclick="window.location.href='https://wa.me/5549999389426?text=Olá!%20Estou%20interessado%20no%20produto%20{{ produto.nome }}.'">
-                                <i class="fas fa-cart-plus"></i> Comprar
-                            </button>
-                            
-                            
-                            
-                                </div>
-                            </div>
-                        </article>
-
-                        <!-- Modal para a Imagem do Produto -->
-                        <div class="modal fade" 
-                             id="modalImagem{{ loop.index }}" 
-                             tabindex="-1" 
-                             aria-labelledby="modalImagemLabel{{ loop.index }}" 
-                             aria-hidden="true">
-                            <div class="modal-dialog modal-dialog-centered modal-lg">
-                                <div class="modal-content">
-                                    <div class="modal-header">
-                                        <h5 class="modal-title" id="modalImagemLabel{{ loop.index }}">
-                                            {{ produto.nome }}
-                                        </h5>
-                                        <button type="button" 
-                                                class="btn-close" 
-                                                data-bs-dismiss="modal" 
-                                                aria-label="Fechar"></button>
-                                    </div>
-                                    <div class="modal-body text-center">
-                                        <img src="{{ produto.imagemURL or '/static/images/placeholder.png' }}" 
-                                             class="img-fluid" 
-                                             alt="{{ produto.nome }}"
-                                             loading="lazy">
-                                    </div>
-                                    <div class="modal-footer">
-                                        <button type="button" 
-                                                class="btn btn-secondary" 
-                                                data-bs-dismiss="modal">
-                                            Fechar
-                                        </button>
-                                    </div>
-                                </div>
+                            <div class="product-actions">
+                                <a href="/produto/{{ produto.codigo }}" 
+                                   class="btn btn-outline-primary btn-product"
+                                   aria-label="Ver detalhes do produto {{ produto.nome }}">
+                                    <i class="fas fa-eye"></i> Detalhes
+                                </a>
+                                <button class="btn btn-violet btn-product" 
+                                aria-label="Comprar {{ produto.nome }}" 
+                                onclick="window.location.href='https://wa.me/5549999389426?text=Olá!%20Estou%20interessado%20no%20produto%20{{ produto.nome }}.'">
+                                    <i class="fas fa-cart-plus"></i> Comprar
+                                </button>
                             </div>
                         </div>
-                        {% endfor %}
-                    </div>
-                </section>
+                    </article>
+                    {% endfor %}
+                </div>
+            </section>
 
                 <!-- Paginação -->
                 {% if total_paginas > 1 %}
@@ -278,5 +239,8 @@
         document.body.style.paddingRight = '0';
     });
 </script>
+<<<<<<< HEAD
 </html>
-
+=======
+</html>
+>>>>>>> 1a51cb59a6d5df188a1ff564a317dcd77cbcf87c

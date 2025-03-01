@@ -1,258 +1,279 @@
-<!doctype html>
-<html lang="pt-BR">
-  <head>
+<!DOCTYPE html>
+<html lang="pt-BR" itemscope itemtype="http://schema.org/WebPage">
+<head>
     <meta charset="UTF-8">
-    <title>Catálogo de Produtos - {{ informacoes['nome_empresa'] | tojson | safe }}</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Catálogo de produtos {{ informacoes['nome_empresa'] | tojson | safe }} - Encontre os melhores produtos com os melhores preços">
+    <meta name="keywords" content="ecommerce, produtos, compras online, {{ informacoes['nome_empresa'] | tojson | safe }}">
+    
+    <!-- Open Graph / Facebook -->
+    <meta property="og:type" content="website">
+    <meta property="og:title" content="{{ informacoes['nome_empresa'] | tojson | safe }} - Loja Online">
+    <meta property="og:description" content="Catálogo completo de produtos {{ informacoes['nome_empresa'] | tojson | safe }}">
+    <meta property="og:image" content="{{ informacoes['logo_url'] }}">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="{{ informacoes['nome_empresa'] | tojson | safe }} - Loja Online">
+    <meta name="twitter:description" content="Catálogo completo de produtos {{ informacoes['nome_empresa'] | tojson | safe }}">
+    <meta name="twitter:image" content="{{ informacoes['logo_url'] }}">
+
+    <title>{{ informacoes['title'] | tojson | safe }} </title>
+    
     <!-- Bootstrap 5 CDN -->
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-    <!-- Google Fonts: Roboto -->
-    <link rel="preconnect" href="https://fonts.googleapis.com">
-    <link href="https://fonts.googleapis.com/css2?family=Roboto:wght@400;500;700&display=swap" rel="stylesheet">
-    <style>
-      body {
-        background-color: #f8f9fa;
-        font-family: 'Roboto', sans-serif;
-      }
-      /* Navbar atualizada */
-      .navbar {
-        background-color: #C2185B;
-      }
-      .navbar-brand img {
-        width: 60px;
-        height: auto;
-      }
-      .navbar-brand {
-        color: #fff;
-        font-size: 1.5rem;
-        font-weight: 700;
-      }
-      .navbar-brand:hover {
-        color: #FFD1DC;
-      }
-      .navbar-nav .nav-link {
-        color: #fff;
-        font-size: 1rem;
-      }
-      .navbar-nav .nav-link:hover {
-        color: #FFD1DC;
-      }
-      /* Cards de produtos */
-      .produto-card {
-        margin-bottom: 20px;
-        transition: transform 0.2s ease-in-out;
-        position: relative;
-        background: #fff;
-        border-radius: 8px;
-        box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
-      }
-      .produto-card:hover {
-        transform: translateY(-5px);
-        box-shadow: 0 6px 10px rgba(0, 0, 0, 0.15);
-      }
-      .produto-imagem {
-        width: 100%;
-        height: 250px;
-        object-fit: contain;
-        border-radius: 8px 8px 0 0;
-        cursor: pointer;
-        padding: 15px;
-      }
-      .card-body {
-        padding: 20px;
-      }
-      .card-title {
-        font-size: 1.25rem;
-        color: #880E4F;
-        font-weight: 700;
-        margin-bottom: 10px;
-      }
-      .card-subtitle {
-        font-size: 0.9rem;
-        color: #4A148C;
-        margin-bottom: 12px;
-      }
-      .card-text {
-        font-size: 1rem;
-        color: #6a1b9a;
-      }
-      .btn-custom {
-        background-color: #C2185B;
-        color: #fff;
-        border: none;
-        font-weight: 500;
-        padding: 10px 20px;
-        border-radius: 5px;
-        transition: all 0.3s ease;
-      }
-      .btn-custom:hover {
-        background-color: #880E4F;
-        color: #fff;
-      }
-      .whatsapp-btn {
-        background-color: #25D366;
-        color: white;
-        font-weight: 500;
-        padding: 10px 20px;
-        border-radius: 5px;
-        display: inline-flex;
-        align-items: center;
-        justify-content: center;
-        text-decoration: none;
-        transition: all 0.3s ease;
-      }
-      .whatsapp-btn:hover {
-        background-color: #128C7E;
-        color: #fff;
-      }
-      .btn-group {
-        display: flex;
-        justify-content: space-between;
-        gap: 8px;
-        margin-top: 15px;
-      }
-      /* Paginação */
-      .pagination .page-item .page-link {
-        color: #C2185B;
-        border: 1px solid #C2185B;
-      }
-      .pagination .page-item.active .page-link {
-        background-color: #C2185B;
-        border-color: #C2185B;
-        color: white;
-      }
-      /* Footer atualizado */
-      .footer {
-        background-color: #880E4F;
-        color: #fff;
-        padding: 30px 0;
-        text-align: center;
-        margin-top: 40px;
-      }
-      .footer a {
-        color: #FF80AB;
-        text-decoration: none;
-      }
-      .footer a:hover {
-        color: #FFD1DC;
-      }
-      /* Formulário de busca */
-      .form-control:focus {
-        border-color: #C2185B;
-        box-shadow: 0 0 0 0.25rem rgba(194,24,91,0.25);
-      }
-      .btn-outline-success {
-        color: #fff;
-        border-color: #fff;
-      }
-      .btn-outline-success:hover {
-        background-color: #fff;
-        color: #C2185B;
-      }
-    </style>
-  </head>
-  <body>
-    <!-- Barra de navegação (mantida conforme atualização de cores) -->
-    <!-- ... resto do código HTML permanece igual ... -->
-    <!-- Barra de navegação -->
-    <nav class="navbar navbar-expand-lg navbar-light">
-      <a class="navbar-brand" href="/" aria-label="Voltar para a página inicial">
-        <img src="{{ informacoes['logo_url'] }}" alt="Logo Mai Essencias">
-        {{ informacoes['nome_empresa'] | tojson | safe }}
-      </a>
-      <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Alternar navegação">
-        <span class="navbar-toggler-icon"></span>
-      </button>
-      <div class="collapse navbar-collapse" id="navbarNav">
-        <ul class="navbar-nav ms-auto">
-          <li class="nav-item">
-            <a class="nav-link" href="#">{{ informacoes['frase_logo'] | tojson | safe }}</a>
-          </li>
-        </ul>
-      </div>
-      <!-- Formulário de busca -->
-      <form class="d-flex" method="GET" action="/">
-        <input class="form-control me-2" type="search" placeholder="Buscar produto" aria-label="Buscar" name="search" value="{{ request.args.get('search', '') }}">
-        <button class="btn btn-outline-success" type="submit">Buscar</button>
-      </form>
-    </nav>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet" 
+        integrity="sha384-9ndCyUaIbzAi2FUVXJi0CjmCapSmO7SnpJef0486qhLnuZ2cdeRhO02iuK6FUUVM" crossorigin="anonymous">
+    
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" 
+        integrity="sha512-iecdLmaskl7CVkqkXNQ/ZH/XLlvWZOJyj7Yy7tcenmpD1ypASozpmT/E0iPtmFIB46ZmdtAc9eNBvH0H/ZpiBw==" 
+        crossorigin="anonymous" referrerpolicy="no-referrer">
+    
+    <!-- CSS Customizado -->
+    <link rel="stylesheet" href="/static/css/styles.css">
 
-    <div class="container mt-4">
-      <h2 class="mb-4 text-center">Catálogo de Produtos</h2>
-      <div class="row">
-        {% for produto in produtos %}
-          <div class="col-md-4">
-            <div class="card produto-card shadow-sm">
-              {% if produto.imagemURL %}
-                <a href="#" data-bs-toggle="modal" data-bs-target="#imagemModal{{ loop.index }}">
-                  <img src="{{ produto.imagemURL }}" alt="{{ produto.nome }}" class="produto-imagem" id="imagemProdutoThumbnail{{ loop.index }}">
-                </a>
-              {% else %}
-                <img src="https://www.jundplay.com.br/lib/img/imagem-nao-disponivel.jpg" alt="Imagem não disponível" class="produto-imagem">
-              {% endif %}
-              <div class="card-body">
-                <h5 class="card-title">{{ produto.nome | tojson | safe }}</h5>
-                <h6 class="card-subtitle mb-2 text-muted">Código: {{ produto.codigo | tojson | safe }}</h6>
-                <p class="card-text"><strong>Preço:</strong> {{ produto.preco | brl }}</p>
-                <p class="card-text">
-                  <strong>Status:</strong>
-                  {% if produto['estoque']['saldoVirtualTotal'] > 0 %}
-                    <span class="badge bg-success text-white">Disponível</span>
-                  {% else %}
-                    <span class="badge bg-warning text-dark">Sob encomenda</span>
-                  {% endif %}
-                </p>
+    <!-- Favicon -->
+    <link rel="icon" type="image/x-icon" href="/static/images/favicon.ico">
+</head>
 
-                <div class="btn-group">
-                  <button class="btn btn-primary btn-custom" onclick="window.location.href='/produto/{{ produto.codigo }}'">Ver Descrição</button>
-                  <a href="https://wa.me/{{ informacoes['whats'] }}?text=Tenho%20interesse%20em%20comprar%20esse%20produto%20{{ produto.nome | tojson | safe }}%20-%20{{ produto.codigo | tojson | safe }}%20-%20https://estilomusical.onrender.com/produto/{{ produto.codigo | tojson | safe }}" class="whatsapp-btn">
-                    <i class="bi-whatsapp"></i> Whats
-                  </a>
+<body>
+    <a class="skip-link visually-hidden-focusable" href="#main-content">
+        Ir para o conteúdo principal
+    </a>
+
+    <!-- Header -->
+    <header class="main-header" role="banner">
+        <div class="container">
+            <nav class="navbar navbar-expand-lg p-0" aria-label="Navegação principal">
+                <div class="container-fluid gap-lg-4">
+                    <a class="navbar-brand" href="/" aria-label="Página inicial">
+                        <img src="{{ informacoes['logo_url'] }}" 
+                            alt="{{ informacoes['nome_empresa'] | safe }}"
+                            class="header-logo"
+                             width="120" 
+                             height="40">
+                        <span class="company-name">{{ informacoes['nome_empresa'] }}</span>
+                    </a>
+
+                    <!-- Formulário de Busca -->
+                    <form class="header-search d-flex flex-grow-1" method="GET" action="/" role="search">
+                        <input type="search" 
+                               class="form-control rounded-start" 
+                               placeholder="Buscar produtos..."
+                               aria-label="Buscar produtos"
+                               name="search"
+                               value="{{ request.args.get('search', '') }}">
+                        <button class="btn btn-warning rounded-end" type="submit">
+                            <i class="fas fa-search"></i>
+                            <span class="visually-hidden">Pesquisar</span>
+                        </button>
+                    </form>
+
+                   
                 </div>
-              </div>
+            </nav>
+        </div>
+    </header>
+
+    <!-- Conteúdo Principal -->
+    <main id="main-content" class="container my-5" role="main">
+        <h1 class="visually-hidden">Catálogo de produtos {{ informacoes['nome_empresa'] | tojson | safe }}</h1>
+        
+        <div class="row">
+            <div class="col-12">
+                <section aria-labelledby="produtos-title">
+                    <h2 id="produtos-title" class="h4 mb-4 text-center">Nossos Produtos</h2>
+
+                    <!-- Mensagem de Feedback para Busca -->
+                    {% if message %}
+                    <div class="alert alert-info" role="alert">
+                        {{ message }}
+                    </div>
+                    {% endif %}
+                    
+                    <div class="product-grid">
+                        {% for produto in produtos %}
+                        <article class="product-card" itemscope itemtype="http://schema.org/Product">
+                            {% if produto['estoque']['saldoVirtualTotal'] > 0 %}
+                                <span class="product-badge" aria-hidden="true">Disponível</span>
+                            {% else %}
+                                <span class="product-badge bg-secondary" aria-hidden="true">Sob Encomenda</span>
+                            {% endif %}
+                            
+                            <!-- Imagem do Produto com Trigger para o Modal -->
+                            <div class="product-image-container" 
+                                 data-bs-toggle="modal" 
+                                 data-bs-target="#modalImagem{{ loop.index }}"
+                                 role="button"
+                                 aria-label="Ampliar imagem do produto {{ produto.nome }}">
+                                <img src="{{ produto.imagemURL or '/static/images/placeholder.png' }}" 
+                                     class="product-image" 
+                                     alt="{{ produto.nome }}" 
+                                     loading="lazy"
+                                     width="300"
+                                     height="200"
+                                     itemprop="image">
+                            </div>
+                            
+                            <div class="product-info">
+                                <div>
+                                    <h3 class="product-title" itemprop="name">{{ produto.nome }}</h3>
+                                    <div class="product-price" itemprop="offers" itemscope itemtype="http://schema.org/Offer">
+                                        <meta itemprop="priceCurrency" content="BRL">
+                                        <span itemprop="price">{{ produto.preco | brl }}</span>
+                                    </div>
+                                    <small class="product-code">Cód: <span itemprop="sku">{{ produto.codigo }}</span></small>
+                                </div>
+                                <div class="product-actions">
+                                    <a href="/produto/{{ produto.codigo }}" 
+                                       class="btn btn-outline-primary btn-product"
+                                       aria-label="Ver detalhes do produto {{ produto.nome }}">
+                                        <i class="fas fa-eye"></i> Detalhes
+                                    </a>
+                                    <button class="btn btn-violet btn-product" 
+                                    aria-label="Comprar {{ produto.nome }}" 
+                                    onclick="window.location.href='https://wa.me/5549999389426?text=Olá!%20Estou%20interessado%20no%20produto%20{{ produto.nome }}.'">
+                                <i class="fas fa-cart-plus"></i> Comprar
+                            </button>
+                            
+                            
+                            
+                                </div>
+                            </div>
+                        </article>
+
+                        <!-- Modal para a Imagem do Produto -->
+                        <div class="modal fade" 
+                             id="modalImagem{{ loop.index }}" 
+                             tabindex="-1" 
+                             aria-labelledby="modalImagemLabel{{ loop.index }}" 
+                             aria-hidden="true">
+                            <div class="modal-dialog modal-dialog-centered modal-lg">
+                                <div class="modal-content">
+                                    <div class="modal-header">
+                                        <h5 class="modal-title" id="modalImagemLabel{{ loop.index }}">
+                                            {{ produto.nome }}
+                                        </h5>
+                                        <button type="button" 
+                                                class="btn-close" 
+                                                data-bs-dismiss="modal" 
+                                                aria-label="Fechar"></button>
+                                    </div>
+                                    <div class="modal-body text-center">
+                                        <img src="{{ produto.imagemURL or '/static/images/placeholder.png' }}" 
+                                             class="img-fluid" 
+                                             alt="{{ produto.nome }}"
+                                             loading="lazy">
+                                    </div>
+                                    <div class="modal-footer">
+                                        <button type="button" 
+                                                class="btn btn-secondary" 
+                                                data-bs-dismiss="modal">
+                                            Fechar
+                                        </button>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                        {% endfor %}
+                    </div>
+                </section>
+
+                <!-- Paginação -->
+                {% if total_paginas > 1 %}
+                <nav class="mt-5" aria-label="Navegação entre páginas">
+                    <ul class="pagination justify-content-center">
+                        {% for p in range(1, total_paginas + 1) %}
+                        <li class="page-item {% if p == pagina %}active{% endif %}">
+                            <a class="page-link" href="?pagina={{ p }}&search={{ request.args.get('search', '') }}" aria-label="Página {{ p }}">
+                                {{ p }}
+                                {% if p == pagina %}<span class="visually-hidden">(página atual)</span>{% endif %}
+                            </a>
+                        </li>
+                        {% endfor %}
+                    </ul>
+                </nav>
+                {% endif %}
             </div>
-          </div>
+        </div>
+    </main>
 
-          <!-- Modal da Imagem do Produto -->
-          <div class="modal fade" id="imagemModal{{ loop.index }}" tabindex="-1" aria-labelledby="imagemModalLabel{{ loop.index }}" aria-hidden="true">
-            <div class="modal-dialog">
-              <div class="modal-content">
-                <div class="modal-header">
-                  <h5 class="modal-title" id="imagemModalLabel{{ loop.index }}">Imagem do Produto</h5>
-                  <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fechar"></button>
-                </div>
-                <div class="modal-body">
-                  <img src="{{ produto.imagemURL }}" alt="{{ produto.nome }}" class="img-fluid" id="imagemProdutoModal{{ loop.index }}">
-                </div>
-              </div>
+    <!-- Footer -->
+    <footer class="main-footer" role="contentinfo">
+        <div class="container">
+            <div class="row g-4">
+                <section class="col-md-3 footer-section">
+                    <h3 class="h5">Sobre Nós</h3>
+                    <address>{{ informacoes['endereco'] }}</address>
+                </section>
+
+                <section class="col-md-3 footer-section">
+                    <h3 class="h5">Atendimento</h3>
+                    <ul class="list-unstyled">
+                        <li><a href="/ajuda" class="text-white text-decoration-none">Central de Ajuda</a></li>
+                        <li><a href="/trocas" class="text-white text-decoration-none">Trocas e Devoluções</a></li>
+                    </ul>
+                </section>
+
+                <section class="col-md-3 footer-section">
+                    <h3 class="h5">Redes Sociais</h3>
+                    <div class="social-icons">
+                        <a href="{{ informacoes['facebook_url'] }}" class="text-decoration-none" aria-label="Facebook">
+                            <i class="fab fa-facebook"></i>
+                        </a>
+                        <a href="{{ informacoes['instagram_url'] }}" class="text-decoration-none" aria-label="Instagram">
+                            <i class="fab fa-instagram"></i>
+                        </a>
+                        <a href="{{ informacoes['youtube_url'] }}" class="text-decoration-none" aria-label="YouTube">
+                            <i class="fab fa-youtube"></i>
+                        </a>
+                    </div>
+                </section>
+
+                <section class="col-md-3 footer-section">
+                    <h3 class="h5">Formas de Pagamento</h3>
+                    <div class="payment-icons">
+                        <i class="fab fa-cc-visa fs-4" aria-hidden="true"></i>
+                        <i class="fab fa-cc-mastercard fs-4" aria-hidden="true"></i>
+                        <i class="fab fa-barcode fs-4" aria-hidden="true"></i>
+                    </div>
+                </section>
             </div>
-          </div>
+            
+            <div class="row mt-4">
+                <div class="col-12 text-center">
+                    <p class="mb-0 small">&copy; {{ ano_atual }} {{ informacoes['nome_empresa'] }}. Todos os direitos reservados.</p>
+                </div>
+            </div>
+        </div>
+    </footer>
 
-        {% endfor %}
-      </div>
+    <!-- WhatsApp Float -->
+    <a href="https://wa.me/{{ informacoes['whats'] }}" 
+       class="whatsapp-float" 
+       aria-label="Fale conosco pelo WhatsApp"
+       target="_blank"
+       rel="noopener">
+        <i class="fab fa-whatsapp"></i>
+    </a>
 
-      <!-- Paginação -->
-      {% if total_paginas > 1 %}
-        <nav aria-label="Navegação de páginas">
-          <ul class="pagination justify-content-center">
-            {% for p in range(1, total_paginas + 1) %}
-              <li class="page-item {% if p == pagina %}active{% endif %}">
-                <a class="page-link" href="?pagina={{ p }}&search={{ request.args.get('search', '') }}">{{ p }}</a>
-              </li>
-            {% endfor %}
-          </ul>
-        </nav>
-      {% endif %}
-    </div>
+    <!-- Bootstrap JS -->
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js" 
+            integrity="sha384-geWF76RCwLtnZ8qwWowPQNguL3RmwHVBC9FhGdlKrxdiJJigb/j/68SIy3Te4Bkz" 
+            crossorigin="anonymous"></script>
+</body>
 
-    <!-- Rodapé -->
-    <div class="footer">
-      <p>{{ informacoes['endereco'] | tojson | safe }}</p>
-      <p><a href="https://wa.me/{{ informacoes['whats'] }}" target="_blank">Entre em contato pelo WhatsApp</a></p>
-    </div>
 
-    <!-- Bootstrap JS Bundle -->
-    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
-
-  </body>
+<script>
+    // Inicialização do modal com controle de scroll
+    document.getElementById('modalImagem').addEventListener('show.bs.modal', function () {
+        document.body.style.overflow = 'hidden';
+        document.body.style.paddingRight = '15px'; // Compensa a barra de scroll
+    });
+    
+    document.getElementById('modalImagem').addEventListener('hidden.bs.modal', function () {
+        document.body.style.overflow = 'auto';
+        document.body.style.paddingRight = '0';
+    });
+</script>
 </html>

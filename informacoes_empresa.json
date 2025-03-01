@@ -1,3 +1,4 @@
+<<<<<<< HEAD
 {
   "nome_empresa": "Mai Ess\u00eancias",
   "title": "Mai Essencias",
@@ -9,3 +10,16 @@
   "instagram_url": "https://instagram.com/mai_essencias",
   "youtube_url": "https://youtube.com/viaaroma"
 }
+=======
+{
+  "nome_empresa": "Mai Ess\u00eancias",
+  "title": "Mai Essencias",
+  "logo_url": "/static/images/logo.png",
+  "frase_logo": "Ess\u00eancias e Aromas",
+  "endereco": "Rua S\u00e3o Salvador, 2525 , Sala 02, Centro - Pinhalzinho SC",
+  "whats": "+554999389426",
+  "facebook_url": "https://facebook.com/mai_essencias",
+  "instagram_url": "https://instagram.com/mai_essencias",
+  "youtube_url": "https://youtube.com/viaaroma"
+}
+>>>>>>> 1a51cb59a6d5df188a1ff564a317dcd77cbcf87c

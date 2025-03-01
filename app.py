@@ -423,7 +423,6 @@ def product_detail(codigo):
     # Expande as informações de tributação
     tributacao = produto['tributacao']
     produto['tributacao_ncm'] = tributacao.get('ncm', 'Não informado')
-    produto['tributacao_cest'] = tributacao.get('cest', 'Não informado')
     
     # Expande as dimensões (caso exista)
     dimensoes = produto['dimensoes']

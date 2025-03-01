@@ -1,6 +1,8 @@
 <!DOCTYPE html>
 <html lang="pt-BR" itemscope itemtype="http://schema.org/WebPage">
 <head>
+    <link href="https://fonts.googleapis.com/css2?family=Dancing+Script:wght@400;700&display=swap" rel="stylesheet">
+
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Catálogo de produtos {{ informacoes['nome_empresa'] | tojson | safe }} - Encontre os melhores produtos com os melhores preços">
@@ -41,39 +43,39 @@
         Ir para o conteúdo principal
     </a>
 
-    <!-- Header -->
-    <header class="main-header" role="banner">
-        <div class="container">
-            <nav class="navbar navbar-expand-lg p-0" aria-label="Navegação principal">
-                <div class="container-fluid gap-lg-4">
-                    <a class="navbar-brand" href="/" aria-label="Página inicial">
+<!-- Header -->
+<header class="main-header" role="banner">
+    <div class="container">
+        <nav class="navbar navbar-expand-lg p-0" aria-label="Navegação principal">
+            <div class="container-fluid gap-lg-4">
+                <a class="navbar-brand" href="/" aria-label="Página inicial">
+                    <div class="logo-container">
                         <img src="{{ informacoes['logo_url'] }}" 
-                            alt="{{ informacoes['nome_empresa'] | safe }}"
-                            class="header-logo"
-                             width="120" 
-                             height="40">
-                        <span class="company-name">{{ informacoes['nome_empresa'] }}</span>
-                    </a>
+                             alt="{{ informacoes['nome_empresa'] | safe }}"
+                             class="header-logo">
+                    </div>
+                    <span class="company-name">{{ informacoes['nome_empresa'] }}</span>
+                </a>
 
-                    <!-- Formulário de Busca -->
-                    <form class="header-search d-flex flex-grow-1" method="GET" action="/" role="search">
-                        <input type="search" 
-                               class="form-control rounded-start" 
-                               placeholder="Buscar produtos..."
-                               aria-label="Buscar produtos"
-                               name="search"
-                               value="{{ request.args.get('search', '') }}">
-                        <button class="btn btn-warning rounded-end" type="submit">
-                            <i class="fas fa-search"></i>
-                            <span class="visually-hidden">Pesquisar</span>
-                        </button>
-                    </form>
+                <!-- Formulário de Busca -->
+                <form class="header-search d-flex flex-grow-1" method="GET" action="/" role="search">
+                    <input type="search" 
+                           class="form-control rounded-start" 
+                           placeholder="Buscar produtos..."
+                           aria-label="Buscar produtos"
+                           name="search"
+                           value="{{ request.args.get('search', '') }}">
+                    <button class="btn btn-warning rounded-end" type="submit">
+                        <i class="fas fa-search"></i>
+                        <span class="visually-hidden">Pesquisar</span>
+                    </button>
+                </form>
 
-                   
-                </div>
-            </nav>
-        </div>
-    </header>
+            </div>
+        </nav>
+    </div>
+</header>
+
 
     <!-- Conteúdo Principal -->
     <main id="main-content" class="container my-5" role="main">

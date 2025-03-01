@@ -1,5 +1,5 @@
 :root {
-  --primary-color: #8A2BE2;
+  --primary-color: #EE82EE;
   --secondary-color: #320034;
   --accent-color: #FFD700;
 }
@@ -20,26 +20,56 @@ body {
   z-index: 1000;
 }
 
-.navbar-brand {
-  color: white !important;
-}
 
 .company-name {
   color: white;
   font-weight: bold;
 }
 
+.navbar-brand {
+  display: flex; /* Flexbox para manter logo, nome e busca na mesma linha */
+  align-items: center; /* Alinha o logo e o nome da empresa verticalmente */
+  gap: 10px; /* Espaçamento entre o logo e o nome */
+}
+
+.logo-container {
+  background-color: white; /* Fundo branco */
+  padding: 5px 10px; /* Ajuste do padding para ficar proporcional */
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  max-width: 120px; /* Largura máxima do fundo */
+  height: 40px; /* Altura do fundo */
+  border-radius: 8px; /* Bordas arredondadas */
+}
 
 .header-logo {
-  width: 40px;
-  height: 40px;
-  object-fit: cover;
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain; /* Ajuste sem distorcer a imagem */
+  transform: scale(2.50); /* Zoom de 25% */
+}
+
+.company-name {
+  font-size: 1.2rem; /* Tamanho da fonte do nome da empresa */
+  font-weight: bold; /* Deixa o nome em negrito */
+  color: #ffffff; /* Cor do texto */
+  font-family: 'sans-serif'; /* Fonte cursiva moderna */
 }
 
 .header-search {
-  flex-grow: 1;
-  max-width: 600px;
-  margin-left: 1rem;
+  display: flex;
+  align-items: center; /* Alinha o campo de busca ao centro */
+  flex-grow: 1; /* Faz a barra de pesquisa ocupar o máximo de espaço disponível */
+  max-width: 400px; /* Limita o tamanho máximo da barra de pesquisa */
+}
+
+.header-search input {
+  width: 100%; /* Faz o campo de pesquisa ocupar todo o espaço disponível */
+}
+
+.header-search button {
+  padding: 0.5rem; /* Ajuste do padding do botão de pesquisa */
 }
 
 .user-menu .nav-link {

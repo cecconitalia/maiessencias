@@ -90,7 +90,7 @@
     <!-- Conteúdo Principal -->
     <main id="main-content" class="container my-5" role="main">
         <h1 class="visually-hidden">Detalhes do Produto - {{ produto.nome | tojson | safe }}</h1>
-        
+
         <div class="row">
            
             <!-- Coluna Esquerda: Imagem e Galeria -->
@@ -178,7 +178,13 @@
             </div>
         </div>
     </main>
-
+        <!-- Botão de Voltar -->
+        <div class="container my-3">
+            <button class="btn btn-secondary" onclick="history.back()">
+                <i class="fas fa-arrow-left"></i> Voltar
+            </button>
+        </div>
+        
     <!-- Footer -->
     <footer class="main-footer" role="contentinfo">
         <div class="container">

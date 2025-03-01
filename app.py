@@ -3,6 +3,7 @@ import requests
 import base64
 import logging
 import random
+from unidecode import unidecode
 import json
 from dotenv import load_dotenv
 import os
@@ -273,34 +274,35 @@ def handle_api_errors(f):
 @app.route('/')
 @handle_api_errors
 def index():
-        # Carregar as informações do arquivo JSON
+    # Carregar as informações do arquivo JSON
     with open('informacoes_empresa.json', 'r') as f:
         informacoes = json.load(f)
 
     """Página principal do catálogo"""
     search_query = request.args.get('search', '').strip().lower()
+    search_query_normalized = unidecode(search_query)  # Remove acentos do termo digitado
 
     # Lista das palavras para filtrar
     palavras = ["essencia", "aromat", "sache", "oleo", "agua", "difus", "home", "perf", "hidro"]
-
+    
     # Obtém todos os produtos (pode ser mais de 100)
     produtos = bling_api.get_all_products()
 
-    # Filtra os produtos que contenham pelo menos uma das palavras
+    # Filtra os produtos removendo acentos do nome antes da busca
     produtos_filtrados = [
         produto for produto in produtos
-        if any(palavra in produto.get('nome', '').lower() for palavra in palavras)
+        if any(palavra in unidecode(produto.get('nome', '').lower()) for palavra in palavras)
     ]
 
     # Ordena os produtos inicialmente por nome (ordem alfabética)
-    produtos_ordenados = sorted(produtos_filtrados, key=lambda p: p.get('nome', '').lower())
+    produtos_ordenados = sorted(produtos_filtrados, key=lambda p: unidecode(p.get('nome', '').lower()))
 
     message = None
     if search_query:
-        # Filtra os produtos que contêm o termo digitado
+        # Filtra os produtos comparando a busca normalizada (sem acentos)
         produtos_filtrados = [
             produto for produto in produtos_ordenados
-            if search_query in produto.get('nome', '').lower()
+            if search_query_normalized in unidecode(produto.get('nome', '').lower())
         ]
         if not produtos_filtrados:
             message = f"Nenhum produto encontrado para '{search_query}'."
@@ -312,7 +314,7 @@ def index():
             )
             produtos_filtrados = sorted(
                 produtos_filtrados,
-                key=lambda p: p.get('nome', '').lower().find(search_query)
+                key=lambda p: unidecode(p.get('nome', '').lower()).find(search_query_normalized)
             )
         produtos_ordenados = produtos_filtrados
     else:
@@ -334,7 +336,8 @@ def index():
         produtos=produtos_pagina,
         pagina=pagina,
         total_paginas=total_paginas,
-        message=message, informacoes=informacoes
+        message=message,
+        informacoes=informacoes
     )
 
 

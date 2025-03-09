@@ -2,6 +2,7 @@ from flask import Flask, render_template, request, abort, url_for, redirect
 import requests
 import base64
 import logging
+import json
 import random
 from dotenv import load_dotenv
 import os
@@ -289,6 +290,9 @@ def handle_api_errors(f):
 @app.route('/')
 @handle_api_errors
 def index():
+        # Carregar as informações do arquivo JSON
+    with open('informacoes_empresa.json', 'r') as f:
+        informacoes = json.load(f)
     # Recebe a query de busca e normaliza o texto
     search_query = request.args.get('search', '').strip()
     normalized_search = normalize_text(search_query) if search_query else ''
@@ -305,6 +309,9 @@ def index():
 
     # Ordena inicialmente por nome (normalizado)
     produtos_ordenados = sorted(produtos_filtrados, key=lambda p: normalize_text(p.get('nome', '')))
+    message = None
+    produtos_sugestoes = []
+
 
     message = None
     if normalized_search:
@@ -348,18 +355,25 @@ def index():
         pagina=pagina,
         total_paginas=total_paginas,
         message=message,
+        produtos_sugestoes=produtos_sugestoes,
+        informacoes=informacoes
     )
+
 
 @app.route('/produto/<codigo>')
 @handle_api_errors
+
 def product_detail(codigo):
+    with open('informacoes_empresa.json', 'r') as f:
+        informacoes = json.load(f)
     produtos = get_cached_products()
     produto = next((p for p in produtos if p.get('codigo') == codigo), None)
     
     if not produto:
         abort(404, description="Produto não encontrado")
         
-    return render_template('produto.html', produto=produto)
+    return render_template('produto.html', produto=produto, 
+                                    informacoes=informacoes)
 
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

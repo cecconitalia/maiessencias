@@ -3,15 +3,47 @@ import requests
 import base64
 import logging
 import random
-from unidecode import unidecode
-import json
 from dotenv import load_dotenv
 import os
 from functools import wraps
-from apscheduler.schedulers.background import BackgroundScheduler  # Agendador de tarefas
+from apscheduler.schedulers.background import BackgroundScheduler
+import time
+from threading import Lock, Thread
+import unicodedata
+import re
 
-# Configuração do Flask
 app = Flask(__name__)
+
+# Função para normalizar textos removendo acentos e caracteres especiais
+def normalize_text(text):
+    # Normaliza para decomposição Unicode (NFD)
+    text = unicodedata.normalize('NFD', text)
+    # Remove os diacríticos
+    text = ''.join(c for c in text if not unicodedata.combining(c))
+    # Deixa em minúsculas e remove caracteres não alfanuméricos (exceto espaços)
+    text = text.lower()
+    text = re.sub(r'[^a-z0-9\s]', '', text)
+    return text
+
+# Path para armazenar a contagem de acessos
+ACCESS_FILE = 'access_count.txt'
+
+def get_access_count():
+    if os.path.exists(ACCESS_FILE):
+        with open(ACCESS_FILE, 'r') as file:
+            return int(file.read())
+    return 0
+
+def increment_access_count():
+    count = get_access_count() + 1
+    with open(ACCESS_FILE, 'w') as file:
+        file.write(str(count))
+
+@app.route('/acessos')
+def acessos():
+    increment_access_count()
+    count = get_access_count()
+    return render_template('acessos.html', numero_de_acessos=count)
 
 # Carregar variáveis de ambiente
 load_dotenv()
@@ -38,71 +70,15 @@ class BlingAPI:
         self.access_token = os.getenv('ACCESS_TOKEN')
         self.base_url = "https://api.bling.com.br/Api/v3"
         self.session = requests.Session()
-        self.scheduler = BackgroundScheduler()  # Agendador de tarefas
-        self._setup_token_refresh_scheduler()   # Inicia o agendador
-
+        self.scheduler = BackgroundScheduler()
+        self._setup_token_refresh_scheduler()
         if not self.access_token:
             raise EnvironmentError("ACCESS_TOKEN não encontrado. Execute o fluxo de autorização.")
         self.PRODUTOS_POR_PAGINA_API = 100
-
-    # ... (outros métodos existentes)
-
-    def get_product_by_code(self, codigo):
-        """Busca um produto específico pelo código usando API v3"""
-        endpoint = f"{self.base_url}/produtos"
-        headers = {
-            'Authorization': f'Bearer {self.access_token}',
-            'Accept': 'application/json'
-        }
-        
-        params = {
-            'codigo': codigo,
-            'limite': 1  # Apenas 1 resultado necessário
-        }
-        
-        try:
-            response = self.session.get(endpoint, headers=headers, params=params)
-            
-            # Se o token expirar, atualiza e tenta novamente
-            if response.status_code == 401:
-                self._refresh_access_token()
-                return self.get_product_by_code(codigo)  # Repetir após atualizar token
-                
-            response.raise_for_status()  # Lança exceção para erros HTTP
-            
-            data = response.json()
-            if data['data']:
-                return self._enrich_product_data(data['data'][0])  # Retorna o produto encontrado
-                
-            return None  # Retorna None se o produto não for encontrado
-            
-        except requests.exceptions.RequestException as e:
-            logger.error(f"Erro ao buscar produto {codigo}: {str(e)}")
-            return None  # Retorna None em caso de erro
-
-    def _enrich_product_data(self, produto):
-            """Complementa dados do produto com informações adicionais da API"""
-            # Buscar detalhes completos do produto
-            endpoint = f"{self.base_url}/produtos/{produto['id']}"
-            headers = {
-                'Authorization': f'Bearer {self.access_token}',
-                'Accept': 'application/json'
-            }
-            
-            try:
-                response = self.session.get(endpoint, headers=headers)
-                response.raise_for_status()  # Lança exceção para erros HTTP
-                full_data = response.json()
-                
-                # Combinar dados básicos com detalhes completos
-                return {**produto, **full_data}
-                
-            except requests.exceptions.RequestException as e:
-                logger.error(f"Erro ao buscar detalhes do produto {produto['id']}: {str(e)}")
-                return produto  # Retorna os dados básicos em caso de erro
+        self.MAX_PAGES = 50  # Limita o número máximo de páginas para evitar loops infinitos
+        self.last_token_refresh_time = time.time()  # Armazena o momento da última atualização
 
     def _setup_token_refresh_scheduler(self):
-        """Inicia o agendador para atualizar tokens a cada 30 segundos."""
         self.scheduler.add_job(
             func=self._refresh_access_token,
             trigger='interval',
@@ -111,7 +87,6 @@ class BlingAPI:
         self.scheduler.start()
 
     def _refresh_access_token(self):
-        """Atualiza o token de acesso OAuth2"""
         try:
             auth_string = f"{self.client_id}:{self.client_secret}"
             encoded_auth = base64.b64encode(auth_string.encode()).decode()
@@ -137,9 +112,10 @@ class BlingAPI:
             tokens = response.json()
             self.access_token = tokens['access_token']
             self.refresh_token = tokens['refresh_token']
+            self.last_token_refresh_time = time.time()  # Atualiza o horário do refresh
             logger.info("Tokens atualizados com sucesso")
             
-            # Atualiza o .env (não recomendado para produção)
+            # Atualiza as variáveis de ambiente e o arquivo .env (não recomendado para produção)
             os.environ['ACCESS_TOKEN'] = self.access_token
             os.environ['REFRESH_TOKEN'] = self.refresh_token
             with open('.env', 'w') as env_file:
@@ -151,12 +127,21 @@ class BlingAPI:
         except Exception as e:
             logger.error(f"Falha ao atualizar tokens: {str(e)}")
 
+    def check_and_refresh_token(self):
+        # Assume que o token tem validade de 7200 segundos (2 horas)
+        # Realiza refresh 100 segundos antes da expiração
+        if time.time() - self.last_token_refresh_time > 7100:
+            logger.info("Token expirado pelo tempo, atualizando...")
+            self._refresh_access_token()
+
     def get_all_products(self):
-        """Obtém todos os produtos da API, lidando com a limitação de 100 produtos por requisição."""
+        # Verifica se o token precisa ser atualizado antes de iniciar as requisições
+        self.check_and_refresh_token()
+
         all_products = []
         page = 1
         
-        while True:
+        while page <= self.MAX_PAGES:
             try:
                 headers = {
                     'Authorization': f'Bearer {self.access_token}',
@@ -178,7 +163,7 @@ class BlingAPI:
                 if response.status_code == 401:
                     logger.info("Token expirado, atualizando...")
                     self._refresh_access_token()
-                    continue  # Repetir a requisição após atualizar o token
+                    continue  # Tenta novamente após atualizar o token
                 
                 response.raise_for_status()
                 
@@ -188,14 +173,13 @@ class BlingAPI:
                 if not products:
                     break
        
-       
                 all_products.extend(products)
                 
                 # Se a quantidade de produtos retornados for menor que o limite, chegamos ao fim.
                 if len(products) < self.PRODUTOS_POR_PAGINA_API:
                     break
                 
-                page += 1  # Avança para a próxima página
+                page += 1
                 
             except requests.exceptions.RequestException as e:
                 logger.error(f"Falha na requisição da API: {str(e)}")
@@ -206,14 +190,50 @@ class BlingAPI:
 # Inicializa a API Bling
 bling_api = BlingAPI()
 
+# Cache de produtos
+cached_products = []
+cache_timestamp = 0
+CACHE_DURATION = 600  # 10 minutos em segundos
+cache_lock = Lock()
+
+def update_product_cache():
+    global cached_products, cache_timestamp
+    try:
+        products = bling_api.get_all_products()
+        with cache_lock:
+            cached_products = products
+            cache_timestamp = time.time()
+        logger.info("Cache de produtos atualizado com sucesso.")
+    except Exception as e:
+        logger.error(f"Erro ao atualizar o cache de produtos: {str(e)}")
+
+def get_cached_products():
+    global cached_products, cache_timestamp
+    with cache_lock:
+        is_expired = (time.time() - cache_timestamp > CACHE_DURATION)
+        current_cache = cached_products.copy()
+    if current_cache and is_expired:
+        logger.info("Cache expirado. Atualizando cache em background...")
+        Thread(target=update_product_cache).start()
+        return current_cache
+    elif not current_cache:
+        logger.info("Cache vazio. Atualizando cache de forma síncrona...")
+        update_product_cache()
+        with cache_lock:
+            return cached_products
+    return current_cache
+
+# Agendador para atualizar o cache de produtos a cada 10 minutos
+product_scheduler = BackgroundScheduler()
+product_scheduler.add_job(update_product_cache, 'interval', seconds=CACHE_DURATION)
+product_scheduler.start()
+
 @app.route('/callback')
 def callback():
-    """Callback de autorização, trocando o código por tokens"""
     code = request.args.get('code')
     if not code:
         return "Erro: código de autorização não encontrado."
     
-    # Troca o código por token de acesso
     token_url = 'https://www.bling.com.br/Api/v3/oauth/token'
     credentials = f'{client_id}:{client_secret}'
     credentials_base64 = base64.b64encode(credentials.encode()).decode('utf-8')
@@ -235,12 +255,10 @@ def callback():
         access_token = tokens.get('access_token')
         refresh_token = tokens.get('refresh_token')
 
-        # Atualiza o .env com os tokens obtidos
         with open('.env', 'a') as env_file:
             env_file.write(f'ACCESS_TOKEN={access_token}\n')
             env_file.write(f'REFRESH_TOKEN={refresh_token}\n')
 
-        # Atualiza as variáveis de ambiente também
         os.environ['ACCESS_TOKEN'] = access_token
         os.environ['REFRESH_TOKEN'] = refresh_token
 
@@ -248,17 +266,14 @@ def callback():
     else:
         return f"Erro ao obter tokens: {response.text}"
 
-
 @app.template_filter('brl')
 def format_brl(value):
-    """Formata valor para Real Brasileiro"""
     try:
         return f'R$ {float(value):,.2f}'.replace(',', 'v').replace('.', ',').replace('v', '.')
     except (ValueError, TypeError):
         return 'R$ 0,00'
 
 def handle_api_errors(f):
-    """Tratamento de erros da API"""
     @wraps(f)
     def wrapper(*args, **kwargs):
         try:
@@ -274,64 +289,53 @@ def handle_api_errors(f):
 @app.route('/')
 @handle_api_errors
 def index():
-    # Carregar as informações do arquivo JSON
-    with open('informacoes_empresa.json', 'r') as f:
-        informacoes = json.load(f)
+    # Recebe a query de busca e normaliza o texto
+    search_query = request.args.get('search', '').strip()
+    normalized_search = normalize_text(search_query) if search_query else ''
 
-    """Página principal do catálogo"""
-    search_query = request.args.get('search', '').strip().lower()
-    search_query_normalized = unidecode(search_query)  # Remove acentos do termo digitado
+    palavras = ["viol", "cord", "p10", "xlr", "pandeiro", 
+                "teclado", "pedestal", "bat", "cap", "tarr", "guit", "baix",
+                "p2", "afin", "som", "baq", "mic", "pilha", "radio", "porta", "pen", "amp",
+                "instr", "amp", "uku", "cav", "corre", "ded", "fone", "pele", "mesa", "palhe", "mini", "amp"]
 
-    # Lista das palavras para filtrar
-    palavras = ["essencia", "aromat", "sache", "oleo", "agua", "difus", "home", "perf", "hidro"]
+    produtos = get_cached_products()
 
-    # Obtém todos os produtos
-    produtos = bling_api.get_all_products()
-
-    # Filtra os produtos mantendo as palavras-chave
+    # Filtra os produtos verificando se alguma das palavras chave está presente
     produtos_filtrados = [
         produto for produto in produtos
-        if any(palavra in unidecode(produto.get('nome', '').lower()) for palavra in palavras)
+        if any(palavra in normalize_text(produto.get('nome', '')) for palavra in palavras)
     ]
 
-    # Garante que sempre haja produtos (caso o filtro retorne vazio, mostra todos)
-    if not produtos_filtrados:
-        produtos_filtrados = produtos  # Fallback para todos os produtos
-
-    # Ordenação inicial alfabética
-    produtos_ordenados = sorted(produtos_filtrados, key=lambda p: unidecode(p.get('nome', '').lower()))
+    # Ordena inicialmente por nome (normalizado)
+    produtos_ordenados = sorted(produtos_filtrados, key=lambda p: normalize_text(p.get('nome', '')))
 
     message = None
-    produtos_sugestoes = []
-
-    if search_query:
-        # Filtra os produtos pela busca
-        produtos_filtrados_busca = [
+    if normalized_search:
+        # Separa a busca em tokens
+        query_tokens = normalized_search.split()
+        # Filtra produtos que contenham pelo menos um dos tokens
+        produtos_filtrados = [
             produto for produto in produtos_ordenados
-            if search_query_normalized in unidecode(produto.get('nome', '').lower())
+            if any(token in normalize_text(produto.get('nome', '')) for token in query_tokens)
         ]
 
-        if not produtos_filtrados_busca:
-            message = "Ops, parece que não encontramos nada :("
-            produtos_sugestoes = random.sample(produtos_ordenados, min(6, len(produtos_ordenados)))
+        if not produtos_filtrados:
+            message = f"Nenhum produto encontrado para '{search_query}'."
         else:
-            # Ordena por relevância (estoque + posição do termo)
-            produtos_filtrados_busca = sorted(
-                produtos_filtrados_busca,
-                key=lambda p: (
-                    -p.get('estoque', {}).get('saldoVirtualTotal', 0),
-                    unidecode(p.get('nome', '').lower()).find(search_query_normalized)
-                )
-            )
-
-        produtos_ordenados = produtos_filtrados_busca
-
+            # Função de pontuação: maior pontuação para produtos que possuem mais tokens e 
+            # com menor índice (mais próximos do início) para o primeiro token encontrado.
+            def product_score(prod):
+                normalized_name = normalize_text(prod.get('nome', ''))
+                score = sum(1 for token in query_tokens if token in normalized_name)
+                positions = [normalized_name.find(token) for token in query_tokens if token in normalized_name]
+                min_pos = min(positions) if positions else float('inf')
+                return (score, -min_pos)
+            # Ordena os produtos com base na pontuação (decrescente)
+            produtos_filtrados = sorted(produtos_filtrados, key=product_score, reverse=True)
+        produtos_ordenados = produtos_filtrados
     else:
-        # Embaralha os produtos apenas na primeira página (sem busca)
-        if request.args.get('pagina', 1) == 1:
-            random.shuffle(produtos_ordenados)
+        random.shuffle(produtos_ordenados)
 
-    # Paginação
     produtos_por_pagina_ui = 30
     pagina = request.args.get('pagina', 1, type=int)
     total_produtos = len(produtos_ordenados)
@@ -347,107 +351,18 @@ def index():
         pagina=pagina,
         total_paginas=total_paginas,
         message=message,
-        produtos_sugestoes=produtos_sugestoes,
-        informacoes=informacoes
     )
 
 @app.route('/produto/<codigo>')
 @handle_api_errors
 def product_detail(codigo):
-    url = 'https://api.bling.com.br/Api/v3/produtos'
-    """Página de detalhes do produto com tratamento seguro de dados"""
-    with open('informacoes_empresa.json', 'r') as f:
-        informacoes = json.load(f)
+    produtos = get_cached_products()
+    produto = next((p for p in produtos if p.get('codigo') == codigo), None)
     
-    # Tenta buscar o produto pela API
-    produto_raw = bling_api.get_product_by_code(codigo)
-    
-    # Log para verificar o retorno da API
-    app.logger.info(f"Produto com código {codigo} retornado pela API: {produto_raw}")
-    
-    if not produto_raw:
-        app.logger.error(f"Produto com código {codigo} não encontrado.")
+    if not produto:
         abort(404, description="Produto não encontrado")
-    
-    # Normalização dos dados, incluindo campos essenciais
-    produto = {
-        'id': produto_raw.get('id'),
-        'codigo': produto_raw.get('codigo'),
-        'nome': produto_raw.get('nome'),
-        'preco': produto_raw.get('preco', 0),
-        'descricaoCurta': produto_raw.get('descricaoCurta', ''),
-        'descricaoComplementar': produto_raw.get('descricaoComplementar', ''),
-        'observacoes': produto_raw.get('observacoes', ''),
-        'imagemURL': produto_raw.get('imagemURL', ''),
-        'unidade': produto_raw.get('unidade', 'UN'),
-        'tipo': produto_raw.get('tipo', ''),
-        'situacao': produto_raw.get('situacao', ''),
-        'formato': produto_raw.get('formato', ''),
-        'pesoLiquido': produto_raw.get('pesoLiquido', 0),
-        'pesoBruto': produto_raw.get('pesoBruto', 0),
-        'volumes': produto_raw.get('volumes', 0),
-        'itensPorCaixa': produto_raw.get('itensPorCaixa', 0),
-        'gtin': produto_raw.get('gtin', ''),
-        'gtinEmbalagem': produto_raw.get('gtinEmbalagem', ''),
-        'tipoProducao': produto_raw.get('tipoProducao', ''),
-        'condicao': produto_raw.get('condicao', 0),
-        'freteGratis': produto_raw.get('freteGratis', False),
-        'marca': produto_raw.get('marca', ''),
-        'linkExterno': produto_raw.get('linkExterno', ''),
-        'descricaoEmbalagemDiscreta': produto_raw.get('descricaoEmbalagemDiscreta', ''),
         
-        # Campos de categoria, estoque, fornecedor, tributacao, midia, dimensões, estrutura, etc.
-        'categoria': produto_raw.get('categoria', {}),
-        'estoque': produto_raw.get('estoque', {}),
-        'fornecedor': produto_raw.get('fornecedor', {}),
-        'dimensoes': produto_raw.get('dimensoes', {}),
-        'tributacao': produto_raw.get('tributacao', {}),
-        'midia': produto_raw.get('midia', {}),
-        'linhaProduto': produto_raw.get('linhaProduto', {}),
-        'estrutura': produto_raw.get('estrutura', {}),
-        'camposCustomizados': produto_raw.get('camposCustomizados', []),
-        'variacoes': produto_raw.get('variacoes', []),
-    }
+    return render_template('produto.html', produto=produto)
 
-    # Processando informações de imagens
-    produto['imagens'] = []
-
-    # Verifica a presença de imagens externas e internas
-    midia = produto.get('midia', {})
-    if midia:
-        externas = midia.get('imagens', {}).get('externas', [])
-        internas = midia.get('imagens', {}).get('internas', [])
-        imagens_extraidas = [img.get('link') for img in externas + internas if img.get('link')]
-        produto['imagens'].extend(imagens_extraidas)
-    
-    # Adiciona a imagem principal (imagemURL), se ela não estiver na lista
-    if produto.get('imagemURL') and produto['imagemURL'] not in produto['imagens']:
-        produto['imagens'].insert(0, produto['imagemURL'])
-    
-    # Expande as informações de fornecedor
-    fornecedor = produto['fornecedor']
-    produto['fornecedor_nome'] = fornecedor.get('contato', {}).get('nome', 'Não informado')
-    produto['fornecedor_codigo'] = fornecedor.get('codigo', 'Não informado')
-    
-    # Expande as informações de estoque
-    estoque = produto['estoque']
-    produto['estoque_total'] = estoque.get('saldoVirtualTotal', 0)
-    
-    # Expande as informações de tributação
-    tributacao = produto['tributacao']
-    produto['tributacao_ncm'] = tributacao.get('ncm', 'Não informado')
-    
-    # Expande as dimensões (caso exista)
-    dimensoes = produto['dimensoes']
-    produto['dimensoes_largura'] = dimensoes.get('largura', 0)
-    produto['dimensoes_altura'] = dimensoes.get('altura', 0)
-    produto['dimensoes_profundidade'] = dimensoes.get('profundidade', 0)
-    produto['dimensoes_unidade'] = dimensoes.get('unidadeMedida', 'Não especificado')
-    
-    # Retorna a página HTML com todos os dados
-    return render_template('produto.html', 
-                           produto=produto,
-                           informacoes=informacoes)
-   
 if __name__ == '__main__':
     app.run(host='0.0.0.0', port=5000)

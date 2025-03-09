@@ -293,7 +293,7 @@ def index():
     search_query = request.args.get('search', '').strip()
     normalized_search = normalize_text(search_query) if search_query else ''
 
-      palavras = ["essencia", "aromat", "sache", "oleo", "agua", "difus", "home", "perf", "hidro"]
+    palavras = ["essencia", "aromat", "sache", "oleo", "agua", "difus", "home", "perf", "hidro"]
 
     produtos = get_cached_products()
 

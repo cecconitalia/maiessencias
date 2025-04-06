@@ -1,0 +1,66 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="bi bi-file-slides me-2"></i> Gerenciar Slides
+        </h1>
+    </div>
+    
+    <!-- Conteúdo da gestão de slides aqui -->
+    <div class="card shadow">
+<!-- Substitua o conteúdo do card-body -->
+<div class="card-body">
+    <div class="d-flex justify-content-end mb-3">
+        <a href="{{ url_for('create_slide') }}" class="btn btn-primary">
+            <i class="bi bi-plus-circle me-1"></i> Novo Slide
+        </a>
+    </div>
+    
+    <div class="table-responsive">
+        <table class="table table-hover">
+            <thead>
+                <tr>
+                    <th>Ordem</th>
+                    <th>Título</th>
+                    <th>Status</th>
+                    <th>Publicação</th>
+                    <th>Ações</th>
+                </tr>
+            </thead>
+            <tbody>
+                {% for slide in slides %}
+                <tr>
+                    <td>{{ slide.ordem }}</td>
+                    <td>{{ slide.titulo }}</td>
+                    <td>
+                        <span class="badge bg-{% if slide.ativo %}success{% else %}danger{% endif %}">
+                            {{ 'Ativo' if slide.ativo else 'Inativo' }}
+                        </span>
+                    </td>
+                    <td>{{ slide.data_publicacao.strftime('%d/%m/%Y %H:%M') }}</td>
+                    <td>
+                        <a href="{{ url_for('edit_slide', id=slide.id) }}" class="btn btn-sm btn-warning">
+                            <i class="bi bi-pencil"></i>
+                        </a>
+                        <form method="POST" action="{{ url_for('admin_excluir_slide', slide_id=slide.id) }}" class="d-inline">
+                            <input type="hidden" name="csrf_token" value="{{ csrf_token() }}"/>
+                            <button type="submit" class="btn btn-sm btn-danger" onclick="return confirm('Tem certeza?')">
+                                <i class="bi bi-trash"></i>
+                            </button>
+                        </form>
+                    </td>
+                </tr>
+                {% else %}
+                <tr>
+                    <td colspan="5" class="text-center">Nenhum slide cadastrado</td>
+                </tr>
+                {% endfor %}
+            </tbody>
+        </table>
+    </div>
+</div>
+    </div>
+</div>
+{% endblock %}

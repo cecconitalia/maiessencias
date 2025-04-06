@@ -1,0 +1,527 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Cadastro - Mai Essências e Aromas</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+    <style>
+        :root {
+            /* --primary-color: #4e73df; */ /* Original */
+            --primary-color: #E91E63; /* COR PRINCIPAL ROSA */
+            --secondary-color: #f8f9fc;
+            /* --accent-color: #2e59d9; */ /* Original */
+            --accent-color: #D81B60; /* Rosa mais escuro */
+            --text-color: #5a5c69;
+        }
+
+        body {
+            background: linear-gradient(135deg, #fef0f5 0%, #fce4ec 100%); /* Gradiente Rosa Claro */
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            padding: 2rem 0; /* Add padding top/bottom */
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+
+        .register-container {
+            max-width: 800px;
+            width: 100%;
+            margin: 2rem auto; /* Add margin for spacing */
+            border-radius: 15px;
+            overflow: hidden;
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.1);
+            display: flex; /* Use flex for layout */
+            flex-wrap: wrap; /* Allow wrapping on smaller screens */
+        }
+
+        .register-left {
+            background: var(--primary-color);
+            color: white;
+            padding: 3rem;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            /* background-image: url('https://images.unsplash.com/photo-1511671782779-c97d3d27a1d4?ixlib=rb-4.0.3&auto=format&fit=crop&w=1350&q=80'); */
+            background-size: cover;
+            background-position: center;
+            position: relative;
+            flex: 1 1 40%; /* Flex properties for responsiveness */
+            min-width: 300px; /* Minimum width for the left side */
+        }
+
+        .register-left::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            right: 0;
+            bottom: 0;
+            /* background: rgba(78, 115, 223, 0.85); */ /* Original */
+            background: rgba(233, 30, 99, 0.85); /* Overlay Rosa */
+            border-radius: 15px 0 0 15px; /* Match container radius */
+        }
+
+        .register-left-content {
+            position: relative;
+            z-index: 1;
+        }
+
+        .register-right {
+            background: white;
+            padding: 3rem;
+            flex: 1 1 60%; /* Flex properties */
+            min-width: 300px;
+        }
+
+        .form-control, .form-select { /* Added form-select */
+            padding: 0.75rem 1rem;
+            border-radius: 8px;
+            border: 1px solid #d1d3e2;
+            height: calc(1.5em + 1.5rem + 2px); /* Standard height */
+        }
+
+        .form-control:focus, .form-select:focus { /* Added form-select */
+            border-color: var(--primary-color);
+            /* box-shadow: 0 0 0 0.25rem rgba(78, 115, 223, 0.25); */ /* Original */
+            box-shadow: 0 0 0 0.25rem rgba(233, 30, 99, 0.25); /* Sombra Rosa */
+        }
+
+        .btn-primary {
+            background-color: var(--primary-color);
+            border: none;
+            padding: 0.75rem;
+            font-weight: 600;
+            border-radius: 8px;
+            transition: all 0.3s;
+        }
+
+        .btn-primary:hover {
+            background-color: var(--accent-color);
+            transform: translateY(-2px);
+        }
+
+        .input-group-text {
+            background-color: #f8f9fc;
+            border-radius: 8px 0 0 8px !important;
+            border: 1px solid #d1d3e2; /* Ensure border matches input */
+            border-right: none; /* Remove right border */
+            height: calc(1.5em + 1.5rem + 2px); /* Match input height */
+        }
+        /* Adjust input border radius when using input-group */
+        .input-group > .form-control {
+             border-radius: 0 8px 8px 0 !important;
+        }
+
+
+        .divider {
+            display: flex;
+            align-items: center;
+            margin: 1.5rem 0;
+        }
+
+        .divider::before, .divider::after {
+            content: "";
+            flex: 1;
+            border-bottom: 1px solid #d1d3e2;
+        }
+
+        .divider-text {
+            padding: 0 1rem;
+            color: var(--text-color);
+            font-size: 0.875rem;
+        }
+
+        .invalid-feedback { /* Make sure invalid feedback is visible */
+            display: none; /* Hide by default */
+            width: 100%;
+            margin-top: 0.25rem;
+            font-size: .875em;
+            color: #dc3545;
+        }
+         /* Show feedback when the input is invalid */
+        .form-control:invalid, .form-select:invalid {
+            border-color: #dc3545;
+        }
+        .was-validated .form-control:invalid ~ .invalid-feedback,
+        .was-validated .form-select:invalid ~ .invalid-feedback,
+        .form-control.is-invalid ~ .invalid-feedback,
+        .form-select.is-invalid ~ .invalid-feedback {
+            display: block;
+        }
+        .text-primary { /* Link "Faça login" */
+             color: var(--primary-color) !important;
+        }
+
+
+        @media (max-width: 991.98px) { /* Adjusted breakpoint */
+             .register-left::before {
+                 border-radius: 15px 15px 0 0; /* Adjust radius for stacked layout */
+             }
+             .register-right {
+                 border-radius: 0 0 15px 15px;
+             }
+        }
+         @media (max-width: 767.98px) { /* Smaller screens */
+              body {
+                   padding: 1rem 0; /* Reduce padding */
+              }
+              .register-container {
+                   margin: 1rem; /* Adjust margin */
+              }
+              .register-left, .register-right {
+                   padding: 1.5rem; /* Reduce padding */
+              }
+         }
+
+
+        .prime-benefits {
+            background-color: #fce4ec; /* Rosa bem claro */
+            border-radius: 8px;
+            padding: 15px;
+            margin-bottom: 20px;
+            border-left: 4px solid var(--primary-color);
+        }
+
+        .loading {
+            background-image: url('data:image/svg+xml;utf8,<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="40" stroke="%23E91E63" stroke-width="8" fill="none" stroke-dasharray="60 20" transform="rotate(0 50 50)"><animateTransform attributeName="transform" type="rotate" repeatCount="indefinite" dur="1s" values="0 50 50;360 50 50"/></circle></svg>'); /* Cor do spinner rosa */
+            background-position: right 10px center;
+            background-repeat: no-repeat;
+            background-size: 20px 20px;
+        }
+    </style>
+</head>
+<body>
+    <div class="register-container">
+        <div class="register-left">
+            <div class="register-left-content">
+                <h1 class="mb-4">Junte-se à nossa comunidade</h1>
+                <p class="mb-4">Faça parte e aproveite benefícios exclusivos.</p>
+                <ul class="list-unstyled">
+                    <li class="mb-2"><i class="bi bi-check-circle-fill me-2"></i> Acesso a ofertas exclusivas</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill me-2"></i> Histórico de pedidos</li>
+                    <li class="mb-2"><i class="bi bi-check-circle-fill me-2"></i> Descontos especiais</li>
+                </ul>
+            </div>
+        </div>
+
+        <div class="register-right">
+            <h2 class="mb-4 text-center">Crie sua conta</h2>
+
+            {% with messages = get_flashed_messages(with_categories=true) %}
+                {% if messages %}
+                    {% for category, message in messages %}
+                        <div class="alert alert-{{ category }} alert-dismissible fade show mb-4" role="alert">
+                            {{ message }}
+                            <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                        </div>
+                    {% endfor %}
+                {% endif %}
+            {% endwith %}
+
+            <form method="POST" class="needs-validation" novalidate> {# Added needs-validation and novalidate #}
+                <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                {# Bloco Prime (Opcional, visual) #}
+                <div class="prime-benefits">
+                    <h6><i class="bi bi-stars me-2"></i> Código Prime</h6>
+                    <p class="small mb-0">Tem um código de indicação? Insira abaixo para ganhar descontos!</p>
+                </div>
+                 <div class="mb-3">
+                    <label for="prime_code" class="form-label visually-hidden">Código Prime (opcional)</label> {# Visually hidden label for accessibility #}
+                    <div class="input-group">
+                        <span class="input-group-text"><i class="bi bi-star-fill text-warning"></i></span>
+                        <input type="text" class="form-control" id="prime_code" name="prime_code" value="{{ prime_code or '' }}" placeholder="Insira o Código Prime aqui (opcional)">
+                    </div>
+                 </div>
+                 {# Fim Bloco Prime #}
+
+                 <h5 class="mt-4 mb-3 border-bottom pb-2">Dados Pessoais</h5>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label for="nome" class="form-label">Nome Completo *</label>
+                        <input type="text" class="form-control" id="nome" name="nome" value="{{ nome or '' }}" required>
+                        <div class="invalid-feedback">
+                             Por favor, informe seu nome completo.
+                         </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="cpf" class="form-label">CPF *</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-person-badge"></i></span>
+                            <input type="text" class="form-control" id="cpf" name="cpf" value="{{ cpf or '' }}"
+                                   placeholder="000.000.000-00" required
+                                   pattern="\d{3}\.\d{3}\.\d{3}-\d{2}"
+                                   title="Digite o CPF no formato 000.000.000-00">
+                        </div>
+                         <div class="invalid-feedback">
+                             Por favor, insira um CPF válido no formato 000.000.000-00.
+                         </div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-6">
+                        <label for="email" class="form-label">Email *</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-envelope"></i></span>
+                            <input type="email" class="form-control" id="email" name="email" value="{{ email or '' }}" required>
+                        </div>
+                         <div class="invalid-feedback">
+                             Por favor, informe um e-mail válido.
+                         </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="telefone" class="form-label">Telefone / WhatsApp</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-phone"></i></span>
+                            <input type="tel" class="form-control" id="telefone" name="telefone" value="{{ telefone or '' }}" placeholder="(00) 00000-0000">
+                        </div>
+                    </div>
+                </div>
+                 <div class="row g-3 mb-3">
+                     <div class="col-12">
+                         <label for="data_nascimento" class="form-label">Data de Nascimento</label>
+                         <input type="date" class="form-control" id="data_nascimento" name="data_nascimento" value="{{ data_nascimento or '' }}">
+                     </div>
+                 </div>
+
+
+                 <h5 class="mt-4 mb-3 border-bottom pb-2">Endereço</h5>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-5">
+                        <label for="cep" class="form-label">CEP</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-geo-alt"></i></span>
+                            <input type="text" class="form-control" id="cep" name="cep" value="{{ cep or '' }}" placeholder="00000-000">
+                        </div>
+                         <div class="invalid-feedback">
+                             Por favor, informe o CEP.
+                         </div>
+                    </div>
+                    <div class="col-md-7">
+                        <label for="endereco" class="form-label">Endereço (Rua, Av.)</label>
+                         <div class="input-group">
+                             <span class="input-group-text"><i class="bi bi-signpost"></i></span>
+                             <input type="text" class="form-control" id="endereco" name="endereco" value="{{ endereco or '' }}" placeholder="Nome da Rua/Avenida">
+                         </div>
+                          <div class="invalid-feedback">
+                             Por favor, informe o endereço.
+                         </div>
+                    </div>
+                </div>
+
+                <div class="row g-3 mb-3">
+                    <div class="col-md-4">
+                        <label for="numero" class="form-label">Número</label>
+                        <input type="text" class="form-control" id="numero" name="numero" value="{{ numero or '' }}" placeholder="Nº">
+                    </div>
+                    <div class="col-md-8">
+                        <label for="complemento" class="form-label">Complemento</label>
+                        <input type="text" class="form-control" id="complemento" name="complemento" value="{{ complemento or '' }}" placeholder="Apto, Bloco, Casa, etc.">
+                    </div>
+                </div>
+
+                 <div class="row g-3 mb-3">
+                    <div class="col-md-5">
+                         <label for="bairro" class="form-label">Bairro</label>
+                         <div class="input-group">
+                             <span class="input-group-text"><i class="bi bi-pin-map"></i></span>
+                             <input type="text" class="form-control" id="bairro" name="bairro" value="{{ bairro or '' }}">
+                         </div>
+                          <div class="invalid-feedback">
+                             Por favor, informe o bairro.
+                         </div>
+                    </div>
+                    <div class="col-md-5">
+                        <label for="cidade" class="form-label">Cidade</label>
+                         <div class="input-group">
+                             <span class="input-group-text"><i class="bi bi-building"></i></span>
+                             <input type="text" class="form-control" id="cidade" name="cidade" value="{{ cidade or '' }}">
+                         </div>
+                          <div class="invalid-feedback">
+                             Por favor, informe a cidade.
+                         </div>
+                    </div>
+                    <div class="col-md-2">
+                        <label for="estado" class="form-label">UF</label>
+                        <input type="text" class="form-control" id="estado" name="estado" value="{{ estado or '' }}" maxlength="2" placeholder="UF">
+                         <div class="invalid-feedback">
+                             UF?
+                         </div>
+                    </div>
+                </div>
+
+                 <h5 class="mt-4 mb-3 border-bottom pb-2">Senha</h5>
+
+                <div class="row g-3 mb-4">
+                    <div class="col-md-6">
+                        <label for="senha" class="form-label">Senha *</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                            <input type="password" class="form-control" id="senha" name="senha" required>
+                        </div>
+                         <div class="invalid-feedback">
+                             Por favor, crie uma senha.
+                         </div>
+                    </div>
+                    <div class="col-md-6">
+                        <label for="confirmar_senha" class="form-label">Confirmar Senha *</label>
+                        <div class="input-group">
+                            <span class="input-group-text"><i class="bi bi-lock"></i></span>
+                            <input type="password" class="form-control" id="confirmar_senha" name="confirmar_senha" required>
+                        </div>
+                         <div class="invalid-feedback">
+                             Por favor, confirme sua senha.
+                         </div>
+                    </div>
+                </div>
+
+                <div class="d-grid mb-4">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        <i class="bi bi-person-plus me-2"></i> Criar Conta
+                    </button>
+                </div>
+
+                <div class="text-center">
+                    <p class="mb-0">Já tem uma conta? <a href="{{ url_for('login', next=next) }}" class="text-primary fw-bold">Faça login</a></p>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+        // Validação Bootstrap (necessária para os feedbacks funcionarem)
+       (function () {
+         'use strict'
+         var forms = document.querySelectorAll('.needs-validation')
+         Array.prototype.slice.call(forms)
+           .forEach(function (form) {
+             form.addEventListener('submit', function (event) {
+               if (!form.checkValidity()) {
+                 event.preventDefault()
+                 event.stopPropagation()
+               }
+               form.classList.add('was-validated')
+             }, false)
+           })
+       })()
+
+        // Máscara para CPF
+        const cpfInput = document.getElementById('cpf');
+         if(cpfInput){
+            cpfInput.addEventListener('input', function (e) {
+                let value = e.target.value.replace(/\D/g, ''); // Remove tudo que não é dígito
+                value = value.substring(0, 11); // Limita a 11 dígitos
+
+                // Aplica a máscara dinamicamente
+                if (value.length > 9) {
+                    value = value.replace(/(\d{3})(\d{3})(\d{3})(\d{2})/, '$1.$2.$3-$4');
+                } else if (value.length > 6) {
+                    value = value.replace(/(\d{3})(\d{3})(\d{1,3})/, '$1.$2.$3');
+                } else if (value.length > 3) {
+                    value = value.replace(/(\d{3})(\d{1,3})/, '$1.$2');
+                }
+                e.target.value = value;
+            });
+
+            cpfInput.addEventListener('invalid', function(event) {
+                if (cpfInput.validity.patternMismatch) {
+                    cpfInput.setCustomValidity('Por favor, use o formato 000.000.000-00.');
+                } else if (cpfInput.validity.valueMissing) {
+                     cpfInput.setCustomValidity('O campo CPF é obrigatório.');
+                } else {
+                    cpfInput.setCustomValidity('');
+                }
+            });
+            cpfInput.addEventListener('input', function(event) {
+                 cpfInput.setCustomValidity('');
+            });
+         }
+
+
+        // Máscara para telefone
+         const telefoneInput = document.getElementById('telefone');
+         if(telefoneInput) {
+            telefoneInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length > 11) value = value.substring(0, 11);
+
+                if (value.length <= 10) {
+                    value = value.replace(/(\d{2})(\d{4})(\d{4})/, '($1) $2-$3');
+                } else {
+                    value = value.replace(/(\d{2})(\d{5})(\d{4})/, '($1) $2-$3');
+                }
+                e.target.value = value;
+            });
+         }
+
+        // Máscara e busca de CEP
+         const cepInput = document.getElementById('cep');
+         if(cepInput) {
+             cepInput.addEventListener('input', function(e) {
+                let value = e.target.value.replace(/\D/g, '');
+                if (value.length > 8) value = value.substring(0, 8);
+                value = value.replace(/(\d{5})(\d{3})/, '$1-$2');
+                e.target.value = value;
+            });
+
+             cepInput.addEventListener('blur', function(e) {
+                const cep = e.target.value.replace(/\D/g, '');
+                if (cep.length !== 8) return;
+
+                cepInput.classList.add('loading');
+
+                fetch(`https://viacep.com.br/ws/${cep}/json/`)
+                    .then(response => response.json())
+                    .then(data => {
+                        const enderecoInput = document.getElementById('endereco');
+                        const bairroInput = document.getElementById('bairro');
+                        const cidadeInput = document.getElementById('cidade');
+                        const estadoInput = document.getElementById('estado');
+                        const numeroInput = document.getElementById('numero');
+
+                        if (!data.erro) {
+                            enderecoInput.value = data.logradouro || '';
+                            bairroInput.value = data.bairro || '';
+                            cidadeInput.value = data.localidade || '';
+                            estadoInput.value = data.uf || '';
+
+                             // Adiciona 'readonly' se o campo foi preenchido pelo CEP
+                             [enderecoInput, bairroInput, cidadeInput, estadoInput].forEach(input => {
+                                  if (input.value) {
+                                       //input.readOnly = true; // Descomente se quiser bloquear
+                                  } else {
+                                       input.readOnly = false;
+                                  }
+                             });
+
+                            numeroInput.focus(); // Foca no número após preencher
+                        } else {
+                             // Limpa campos e permite edição se CEP não for encontrado
+                             [enderecoInput, bairroInput, cidadeInput, estadoInput].forEach(input => {
+                                  input.value = '';
+                                  input.readOnly = false;
+                             });
+                            console.warn('CEP não encontrado ou inválido.');
+                        }
+                    })
+                    .catch(error => {
+                         console.error('Erro ao buscar CEP:', error);
+                         // Permite edição em caso de erro
+                         [document.getElementById('endereco'), document.getElementById('bairro'), document.getElementById('cidade'), document.getElementById('estado')].forEach(input => {
+                              input.readOnly = false;
+                         });
+                     })
+                    .finally(() => cepInput.classList.remove('loading'));
+             });
+         }
+
+    </script>
+
+</body>
+</html>

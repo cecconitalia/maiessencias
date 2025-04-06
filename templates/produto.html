@@ -1,0 +1,560 @@
+<!doctype html>
+<html lang="pt-BR">
+  <head>
+    <meta charset="utf-8">
+    <title>{{ produto.nome }} - Mai Essências e Aromas</title>
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <meta name="description" content="{{ produto.descricaoCurta|default('Detalhes do produto musical', true)|striptags }}"> <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.3/font/bootstrap-icons.css" rel="stylesheet">
+    <style>
+      /* Layout semelhante ao catalogo.html */
+      body {
+        background-color: #fef0f5; /* Fundo rosa claro */
+      }
+      .navbar {
+        /* background-color: #000000; */ /* Original */
+         background-color: #E91E63; /* Cor Principal Rosa */
+      }
+      .navbar-brand img {
+        width: 50px;
+        height: auto;
+      }
+      .navbar-brand {
+        /* color: #FFD700; */ /* Original */
+         color: #ffffff; /* Branco */
+      }
+      .navbar-brand:hover {
+        /* color: #FFDD44; */ /* Original */
+         color: #F8BBD0; /* Rosa Claro */
+      }
+      .navbar-nav .nav-link {
+        /* color: #fff; */ /* Original */
+         color: #ffffff;
+      }
+      .navbar-nav .nav-link:hover {
+        /* color: #FFD700; */ /* Original */
+         color: #F8BBD0; /* Rosa Claro */
+      }
+      .navbar-nav .nav-item {
+        margin-right: 15px;
+      }
+      /* Estilos específicos da página de produto */
+      .produto-card { /* Usado para a coluna de informações e imagem */
+        margin-bottom: 20px;
+        transition: transform 0.2s ease-in-out;
+        position: relative;
+        border: 1px solid #dee2e6; /* Adiciona uma borda suave */
+        border-radius: 8px; /* Bordas arredondadas */
+        background-color: #fff; /* Fundo branco para o card */
+        box-shadow: 0 2px 4px rgba(0,0,0,0.05); /* Sombra suave */
+      }
+      /* Ajuste para imagens do carrossel */
+      .carousel-image {
+        height: 400px; /* Altura maior para destaque */
+        object-fit: contain;
+        background-color: #fff; /* Fundo branco para a imagem */
+        border-radius: 8px 8px 0 0; /* Arredonda cantos superiores */
+        padding: 15px; /* Espaçamento interno */
+      }
+      .thumbnail-item {
+        height: 80px;
+        object-fit: contain; /* Mudar para contain para ver a imagem inteira */
+        cursor: pointer;
+        transition: all 0.3s ease;
+        border: 1px solid #ddd; /* Borda suave nas miniaturas */
+        padding: 3px; /* Pequeno padding */
+        background-color: #fff;
+      }
+      .thumbnail-item:hover {
+        transform: scale(1.05);
+        box-shadow: 0 0 10px rgba(0,0,0,0.2);
+        border-color: #E91E63; /* Destaca a borda rosa no hover */
+      }
+      .thumbnail-item.active {
+        border: 2px solid #E91E63; /* Borda rosa mais grossa para miniatura ativa */
+      }
+      .carousel-control-prev, .carousel-control-next {
+        background-color: rgba(233, 30, 99, 0.3); /* Fundo rosa translúcido */
+        width: 45px; /* Um pouco maior */
+        height: 45px;
+        border-radius: 50%;
+        top: 50%;
+        transform: translateY(-50%);
+      }
+       .carousel-control-prev-icon, .carousel-control-next-icon {
+         filter: brightness(0) invert(1); /* Ícones brancos */
+       }
+      #backToTop { /* Estilo botão voltar ao topo */
+        display: none;
+        position: fixed;
+        bottom: 20px;
+        right: 20px;
+        z-index: 99;
+        border: none;
+        outline: none;
+        /* background-color: #000; */ /* Original */
+        /* color: #FFD700; */ /* Original */
+        background-color: #E91E63; /* Rosa */
+        color: #fff; /* Branco */
+        cursor: pointer;
+        padding: 10px 13px;
+        border-radius: 50%;
+        font-size: 18px;
+        box-shadow: 0 2px 5px rgba(0,0,0,0.3);
+      }
+
+      #backToTop:hover {
+        /* background-color: #333; */ /* Original */
+        background-color: #D81B60; /* Rosa Escuro */
+      }
+      /* Toast styles */
+      .toast {
+        min-width: 250px;
+      }
+      /* Overrides Bootstrap */
+       .btn-primary {
+         background-color: #E91E63 !important;
+         border-color: #E91E63 !important;
+         color: #fff !important;
+       }
+       .btn-primary:hover {
+         background-color: #D81B60 !important;
+         border-color: #D81B60 !important;
+       }
+        .text-success { /* Preço */
+            color: #E91E63 !important; /* Rosa em vez de verde */
+        }
+         .badge.text-bg-success { /* Disponível */
+            background-color: #4CAF50 !important; /* Manter verde */
+            color: white !important;
+         }
+          .badge.text-bg-danger { /* Indisponível */
+             background-color: #F44336 !important; /* Manter vermelho */
+             color: white !important;
+         }
+         .breadcrumb-item a { /* Breadcrumb */
+             color: #E91E63;
+             text-decoration: none;
+         }
+          .breadcrumb-item a:hover {
+             color: #D81B60;
+         }
+
+      /* Ajustes responsivos */
+      @media (max-width: 767.98px) {
+        .carousel-image {
+          height: 300px; /* Reduz altura em telas menores */
+        }
+        .thumbnail-item {
+          height: 60px;
+        }
+        h1.h2 { /* Reduz tamanho do título em mobile */
+          font-size: 1.5rem;
+        }
+      }
+       .product-description img { /* Garante que imagens na descrição sejam responsivas */
+           max-width: 100%;
+           height: auto;
+           margin-top: 10px;
+           margin-bottom: 10px;
+           border-radius: 5px;
+       }
+    </style>
+    <script async src="https://www.googletagmanager.com/gtag/js?id=AW-846593424"></script>
+    <script>
+      window.dataLayer = window.dataLayer || [];
+      function gtag(){dataLayer.push(arguments);}
+      gtag('js', new Date());
+      gtag('config', 'AW-846593424');
+    </script>
+  </head>
+  <body>
+    <nav class="navbar navbar-expand-lg"> <div class="container-fluid">
+        <a class="navbar-brand" href="{{ url_for('index') }}" aria-label="Voltar para a página inicial">
+          <img src="http://ofertacobrasil.com.br/ofertaco/empresas/LOGO%20SEM%20FUNDO.png" alt="Logo Mai Essências e Aromas">
+          Mai Essências e Aromas
+        </a>
+
+        <a class="nav-link position-relative me-3 d-lg-none" href="{{ url_for('ver_carrinho') }}" aria-label="Carrinho de compras">
+          <i class="bi bi-cart3" style="font-size: 1.2rem; color: #F8BBD0;"></i>
+          {% if cart_total_items > 0 %}
+            <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-counter">
+              {{ cart_total_items }}
+            </span>
+          {% else %}
+             <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-counter" style="display: none;">0</span>
+          {% endif %}
+        </a>
+
+        <form class="search-form d-flex order-lg-2 mx-2 flex-grow-1" method="GET" action="{{ url_for('index') }}"> {# Action aponta para a rota do catálogo #}
+          <div class="input-group">
+            <input class="form-control form-control-sm" type="search" placeholder="Buscar produto" aria-label="Buscar" name="search" value="{{ request.args.get('search', '') }}">
+            <button class="btn btn-outline-success btn-sm" type="submit">
+              <i class="bi bi-search"></i>
+            </button>
+          </div>
+        </form>
+
+        <div class="order-lg-3 me-3 d-none d-lg-block">
+          <a class="nav-link position-relative" href="{{ url_for('ver_carrinho') }}" aria-label="Carrinho de compras">
+            <i class="bi bi-cart3" style="font-size: 1.2rem; color: #F8BBD0;"></i>
+            {% if cart_total_items > 0 %}
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-counter">
+                {{ cart_total_items }}
+              </span>
+            {% else %}
+              <span class="position-absolute top-0 start-100 translate-middle badge rounded-pill bg-danger cart-counter" style="display: none;">0</span>
+            {% endif %}
+          </a>
+        </div>
+
+        <div class="d-flex align-items-center order-lg-4">
+          {% if current_user.is_authenticated %}
+            <div class="dropdown">
+              <a class="nav-link dropdown-toggle" href="#" role="button" data-bs-toggle="dropdown" aria-expanded="false">
+                <i class="bi bi-person-circle" style="color: #F8BBD0;"></i>
+                {{ current_user.nome }}
+              </a>
+              <ul class="dropdown-menu dropdown-menu-end">
+                <li><a class="dropdown-item" href="{{ url_for('perfil') }}"><i class="bi bi-person"></i> Meu Perfil</a></li>
+                <li><a class="dropdown-item" href="{{ url_for('listar_pedidos') }}"><i class="bi bi-receipt"></i> Meus Pedidos</a></li>
+                <li><hr class="dropdown-divider"></li>
+                <li><a class="dropdown-item text-danger" href="{{ url_for('logout') }}"><i class="bi bi-box-arrow-right"></i> Sair</a></li>
+              </ul>
+            </div>
+          {% else %}
+            <div class="d-flex gap-2">
+              <a class="btn btn-outline-primary btn-sm" href="{{ url_for('login') }}"><i class="bi bi-box-arrow-in-right"></i> Login</a>
+              <a class="btn btn-primary btn-sm" href="{{ url_for('registrar') }}"><i class="bi bi-person-plus"></i> Registrar</a>
+            </div>
+          {% endif %}
+        </div>
+
+        <button class="navbar-toggler order-lg-5" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Toggle navigation">
+           <span class="navbar-toggler-icon" style="background-image: url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 0.75)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e\");"></span>
+        </button>
+      </div>
+    </nav>
+
+
+    <div class="container mt-4">
+        <nav aria-label="breadcrumb" class="mb-4">
+            <ol class="breadcrumb">
+                <li class="breadcrumb-item"><a href="{{ url_for('index') }}">Catálogo</a></li>
+                <li class="breadcrumb-item active" aria-current="page">{{ produto.nome }}</li>
+            </ol>
+        </nav>
+
+        <div class="row g-4">
+            <div class="col-md-6">
+                 <div class="produto-card"> {# Adiciona a classe produto-card para aplicar o estilo #}
+                    {% if imagens %}
+                        <div id="productCarousel" class="carousel slide shadow-sm rounded-3" data-bs-ride="carousel"> {# Adiciona shadow e borda arredondada #}
+                            <div class="carousel-indicators">
+                                {% for img in imagens %}
+                                    <button type="button" data-bs-target="#productCarousel"
+                                            data-bs-slide-to="{{ loop.index0 }}"
+                                            class="{{ 'active' if loop.first }}"
+                                            aria-current="{{ 'true' if loop.first }}"
+                                            aria-label="Slide {{ loop.index }}"></button>
+                                {% endfor %}
+                            </div>
+
+                            <div class="carousel-inner">
+                                {% for img in imagens %}
+                                    <div class="carousel-item {{ 'active' if loop.first }}">
+                                        <img src="{{ url_for('proxy_image', url=img.url) }}" {# Usa o proxy #}
+                                             class="d-block w-100 carousel-image"
+                                             alt="{{ produto.nome }} - Imagem {{ loop.index }}"
+                                             loading="lazy"
+                                             onerror="this.onerror=null; this.src='{{ url_for('static', filename='images/sem-imagem.jpg') }}';"> {# Fallback #}
+                                    </div>
+                                {% endfor %}
+                            </div>
+
+                            <button class="carousel-control-prev" type="button" data-bs-target="#productCarousel" data-bs-slide="prev">
+                                <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Anterior</span>
+                            </button>
+                            <button class="carousel-control-next" type="button" data-bs-target="#productCarousel" data-bs-slide="next">
+                                <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                                <span class="visually-hidden">Próximo</span>
+                            </button>
+                        </div>
+
+                        <div class="row g-2 mt-3 justify-content-center"> {# Centraliza as miniaturas #}
+                            {% for img in imagens %}
+                                <div class="col-auto"> {# Usa col-auto para ajuste automático #}
+                                    <img src="{{ url_for('proxy_image', url=img.thumb) }}" {# Usa o proxy #}
+                                         class="img-thumbnail thumbnail-item {{ 'active' if loop.first }}"
+                                         style="max-width: 80px; height: 80px;" {# Tamanho fixo para consistência #}
+                                         alt="Thumbnail {{ loop.index }}"
+                                         data-bs-target="#productCarousel"
+                                         data-bs-slide-to="{{ loop.index0 }}"
+                                         onclick="setActiveThumb(this)"
+                                         onerror="this.style.display='none'"> {# Esconde se a thumb falhar #}
+                                </div>
+                            {% endfor %}
+                        </div>
+                    {% else %}
+                         {# Fallback se não houver imagens #}
+                         <div class="card h-100 produto-card">
+                            <div class="card-body text-center d-flex align-items-center justify-content-center" style="min-height: 400px;">
+                                <div>
+                                    <i class="bi bi-image text-muted" style="font-size: 4rem;"></i>
+                                    <p class="text-muted mt-2">Imagem não disponível</p>
+                                </div>
+                            </div>
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+
+            <div class="col-md-6">
+                <div class="card h-100 shadow-sm produto-card"> {# Aplica estilo de card #}
+                    <div class="card-body p-4"> {# Adiciona mais padding interno #}
+                      <h1 class="h2 mb-3 fw-light">{{ produto.nome }}</h1> {# Fonte mais leve #}
+
+                      <div class="d-flex align-items-center justify-content-between mb-4">
+                          <span class="h3 text-success fw-bold">{{ produto.preco|brl }}</span>
+                           {# Adiciona data attribute para JS e ID único #}
+                           <span id="stockStatus_{{ produto.id }}" class="badge fs-6 rounded-pill text-bg-{{ 'success' if produto.estoque.saldoVirtualTotal > 0 else 'danger' }}"
+                                data-produto-id="{{ produto.id }}">
+                              {% if produto.estoque.saldoVirtualTotal > 0 %}
+                                  <i class="bi bi-check-circle me-1"></i> Disponível ({{ produto.estoque.saldoVirtualTotal }})
+                              {% else %}
+                                  <i class="bi bi-x-circle me-1"></i> Indisponível
+                              {% endif %}
+                          </span>
+                      </div>
+
+                      <dl class="row mb-4">
+                          <dt class="col-sm-3 text-muted">Código</dt>
+                          <dd class="col-sm-9">{{ produto.codigo }}</dd>
+
+                          {# Renderiza a descrição HTML com segurança #}
+                          {% if descricao and descricao != 'Sem descrição disponível' %}
+                              <dt class="col-sm-12 mt-3 text-muted">Descrição</dt>
+                              <dd class="col-sm-12 product-description">
+                                {{ descricao|safe }}
+                              </dd>
+                          {% else %}
+                              <dt class="col-sm-3 text-muted">Descrição</dt>
+                              <dd class="col-sm-9 text-muted fst-italic">Sem descrição disponível.</dd>
+                          {% endif %}
+                      </dl>
+
+                      {# Formulário Adicionar ao Carrinho #}
+                      <form class="add-to-cart-form" method="POST" action="{{ url_for('adicionar_ao_carrinho') }}">
+                          <input type="hidden" name="produto_id" value="{{ produto.id }}">
+                          <input type="hidden" name="csrf_token" value="{{ csrf_token() }}">
+
+                          <div class="row g-2 align-items-center">
+                              <div class="col-auto">
+                                   <label for="quantity_{{ produto.id }}" class="col-form-label fw-bold">Quantidade:</label>
+                              </div>
+                              <div class="col" style="max-width: 120px;"> {# Limita largura do input de quantidade #}
+                                  <input type="number"
+                                         name="quantidade"
+                                         id="quantity_{{ produto.id }}"
+                                         value="1"
+                                         min="1"
+                                         max="{{ produto.estoque.saldoVirtualTotal if produto.estoque.saldoVirtualTotal > 0 else 1 }}"
+                                         class="form-control form-control-lg text-center quantity-input" {# Maior e centralizado #}
+                                         aria-label="Quantidade"
+                                         {{ 'disabled' if produto.estoque.saldoVirtualTotal <= 0 }}>
+                              </div>
+                          </div>
+                          <div class="d-grid gap-2 mt-3"> {# Botão ocupa largura total #}
+                              <button type="submit"
+                                      class="btn btn-primary btn-lg cart-btn"
+                                      id="addToCartBtn_{{ produto.id }}"
+                                      {{ 'disabled' if produto.estoque.saldoVirtualTotal <= 0 }}>
+                                  <i class="bi bi-cart-plus"></i>
+                                  {{ 'Adicionar ao Carrinho' if produto.estoque.saldoVirtualTotal > 0 else 'Produto Indisponível' }}
+                              </button>
+                          </div>
+                      </form>
+                      {# Fim do Formulário #}
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <button id="backToTop" aria-label="Voltar ao topo" title="Voltar ao topo">
+      <i class="bi bi-arrow-up"></i>
+    </button>
+
+    <div id="loadingSpinner" class="d-none" style="position: fixed; top: 50%; left: 50%; transform: translate(-50%, -50%); z-index: 1000;">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Carregando...</span>
+      </div>
+    </div>
+
+    <div class="toast-container position-fixed bottom-0 end-0 p-3">
+        <div id="toastSuccess" class="toast align-items-center text-white bg-success border-0" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="d-flex">
+            <div class="toast-body">
+              <i class="bi bi-check-circle-fill me-2"></i> Produto adicionado ao carrinho!
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Fechar"></button>
+          </div>
+        </div>
+
+        <div id="toastError" class="toast align-items-center text-white bg-danger border-0" role="alert" aria-live="assertive" aria-atomic="true">
+          <div class="d-flex">
+            <div class="toast-body" id="toastErrorMessage">
+              <i class="bi bi-exclamation-triangle-fill me-2"></i> Erro ao adicionar produto!
+            </div>
+            <button type="button" class="btn-close btn-close-white me-2 m-auto" data-bs-dismiss="toast" aria-label="Fechar"></button>
+          </div>
+        </div>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+    <script>
+      // Funções para voltar ao topo
+      const backToTopButton = document.getElementById('backToTop');
+      if (backToTopButton) {
+          window.addEventListener('scroll', () => {
+            backToTopButton.style.display = window.scrollY > 300 ? 'block' : 'none';
+          });
+          backToTopButton.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+          });
+      }
+
+      // Funções para o carrossel e thumbnails
+      function setActiveThumb(element) {
+        document.querySelectorAll('.thumbnail-item').forEach(thumb => {
+          thumb.classList.remove('active');
+        });
+        element.classList.add('active');
+        // Não precisa mais do data-bs-target/slide-to na thumb se o carrossel já estiver configurado
+      }
+
+      const productCarouselElement = document.getElementById('productCarousel');
+      if (productCarouselElement) {
+          productCarouselElement.addEventListener('slid.bs.carousel', function (e) {
+            const activeIndex = e.to;
+            const thumbs = document.querySelectorAll('.thumbnail-item');
+            thumbs.forEach((thumb, index) => {
+              thumb.classList.toggle('active', index === activeIndex);
+            });
+          });
+      }
+
+      // Script para adicionar produto ao carrinho (ajustado para melhor feedback)
+      document.addEventListener('DOMContentLoaded', function() {
+          const forms = document.querySelectorAll('.add-to-cart-form');
+          const toastSuccess = new bootstrap.Toast(document.getElementById('toastSuccess'));
+          const toastError = new bootstrap.Toast(document.getElementById('toastError'));
+          const globalCartCounters = document.querySelectorAll('.cart-counter'); // Seleciona todos os contadores
+
+          forms.forEach(form => {
+              form.addEventListener('submit', function(e) {
+                  e.preventDefault();
+                  const produtoId = this.querySelector('input[name="produto_id"]').value;
+                  const quantityInput = this.querySelector('.quantity-input');
+                  const button = this.querySelector('.cart-btn');
+                  const stockStatusElement = document.getElementById(`stockStatus_${produtoId}`); // Pega o badge pelo ID
+
+                  // Mostra spinner no botão (opcional)
+                  button.innerHTML = '<span class="spinner-border spinner-border-sm" role="status" aria-hidden="true"></span> Adicionando...';
+                  button.disabled = true;
+                  if (quantityInput) quantityInput.disabled = true;
+
+
+                  fetch(this.action, {
+                      method: 'POST',
+                      body: new FormData(this),
+                      headers: {
+                          'X-CSRFToken': this.querySelector('input[name="csrf_token"]').value
+                      }
+                  })
+                  .then(response => response.json().then(data => ({ status: response.status, body: data }))) // Captura status e body
+                  .then(({ status, body }) => {
+                      if (status === 200 && body.success) {
+                          toastSuccess.show();
+
+                          // Atualiza todos os contadores do carrinho na página
+                          globalCartCounters.forEach(counter => {
+                              counter.textContent = body.cart_total_items;
+                               if (body.cart_total_items > 0) {
+                                   counter.style.display = ''; // Garante que fique visível
+                              }
+                          });
+
+
+                          // Atualiza o status do estoque no card específico
+                          if(stockStatusElement && body.estoque_disponivel !== undefined) {
+                              if(body.estoque_disponivel <= 0) {
+                                  stockStatusElement.className = 'badge fs-6 rounded-pill text-bg-danger'; // Atualiza classe
+                                  stockStatusElement.innerHTML = '<i class="bi bi-x-circle me-1"></i> Indisponível';
+                                  button.innerHTML = '<i class="bi bi-cart-plus"></i> Produto Indisponível';
+                                  button.disabled = true; // Mantém desabilitado
+                                  if (quantityInput) quantityInput.disabled = true;
+                                  if (quantityInput) quantityInput.max = 1; // Define max como 1 se indisponível
+                              } else {
+                                  stockStatusElement.className = 'badge fs-6 rounded-pill text-bg-success'; // Garante classe correta
+                                  stockStatusElement.innerHTML = `<i class="bi bi-check-circle me-1"></i> Disponível (${body.estoque_disponivel})`;
+                                  button.innerHTML = '<i class="bi bi-cart-plus"></i> Adicionar ao Carrinho'; // Restaura botão
+                                  button.disabled = false; // Reabilita botão
+                                  if (quantityInput) quantityInput.disabled = false;
+                                  if (quantityInput) quantityInput.max = body.estoque_disponivel; // Atualiza max
+                              }
+                          } else {
+                               // Se não houver info de estoque, apenas reabilita o botão
+                               button.innerHTML = '<i class="bi bi-cart-plus"></i> Adicionar ao Carrinho';
+                               button.disabled = false;
+                               if (quantityInput) quantityInput.disabled = false;
+                          }
+
+                      } else {
+                          // Trata erros (400, 404, 500, ou success=false)
+                          document.getElementById('toastErrorMessage').innerHTML = `<i class="bi bi-exclamation-triangle-fill me-2"></i> ${body.message || 'Erro ao adicionar produto!'}`;
+                          toastError.show();
+                           // Restaura o botão em caso de erro
+                           button.innerHTML = '<i class="bi bi-cart-plus"></i> Adicionar ao Carrinho';
+                           // Reabilita o botão SOMENTE se o erro NÃO for de estoque esgotado
+                           const isOutOfStock = body.estoque_disponivel !== undefined && body.estoque_disponivel <= 0;
+                           if (!isOutOfStock) {
+                               button.disabled = false;
+                               if (quantityInput) quantityInput.disabled = false;
+                           } else {
+                               // Se o erro foi por falta de estoque, atualiza o status visualmente
+                               if (stockStatusElement) {
+                                    stockStatusElement.className = 'badge fs-6 rounded-pill text-bg-danger';
+                                    stockStatusElement.innerHTML = '<i class="bi bi-x-circle me-1"></i> Indisponível';
+                               }
+                               button.innerHTML = '<i class="bi bi-cart-plus"></i> Produto Indisponível';
+                               button.disabled = true;
+                               if (quantityInput) quantityInput.disabled = true;
+                               if (quantityInput) quantityInput.max = 1;
+                           }
+                      }
+                  })
+                  .catch(error => {
+                      console.error('Erro na requisição:', error);
+                      document.getElementById('toastErrorMessage').innerHTML = '<i class="bi bi-exclamation-triangle-fill me-2"></i> Erro de conexão.';
+                      toastError.show();
+                       // Restaura o botão em caso de erro de conexão
+                       button.innerHTML = '<i class="bi bi-cart-plus"></i> Adicionar ao Carrinho';
+                       // Reabilita o botão pois não sabemos o estado do estoque
+                       button.disabled = false;
+                       if (quantityInput) quantityInput.disabled = false;
+                  });
+              });
+          });
+
+          // Esconde o badge do carrinho se o total for 0 ao carregar a página
+          globalCartCounters.forEach(counter => {
+               if (parseInt(counter.textContent || '0') === 0) {
+                    counter.style.display = 'none';
+               }
+          });
+      });
+    </script>
+  </body>
+</html>

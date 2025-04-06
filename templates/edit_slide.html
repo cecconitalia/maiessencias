@@ -1,0 +1,84 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="bi bi-pencil-square me-2"></i> Editar Slide
+        </h1>
+        <a href="{{ url_for('admin_slides') }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Voltar
+        </a>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                
+                <div class="mb-3">
+                    <label class="form-label">Título</label>
+                    {{ form.titulo(class="form-control") }}
+                    {% for error in form.titulo.errors %}
+                        <div class="invalid-feedback d-block">{{ error }}</div>
+                    {% endfor %}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Conteúdo</label>
+                    {{ form.conteudo(class="form-control", rows=4) }}
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Imagem Atual</label>
+                        <div class="border p-2 text-center">
+                            {% if slide.imagem %}
+                                <img src="{{ url_for('static', filename='uploads/slides/' + slide.imagem) }}" 
+                                     class="img-fluid" 
+                                     style="max-height: 150px"
+                                     alt="{{ slide.titulo }}">
+                            {% else %}
+                                <div class="text-muted py-3">Nenhuma imagem cadastrada</div>
+                            {% endif %}
+                        </div>
+                        <small class="form-text text-muted">Para alterar, selecione nova imagem abaixo</small>
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Nova Imagem (opcional)</label>
+                        {{ form.imagem(class="form-control") }}
+                        <small class="form-text text-muted">Deixe em branco para manter a atual</small>
+                        {% for error in form.imagem.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                </div>
+
+                <div class="row">
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Status</label>
+                        {{ form.ativo(class="form-select") }}
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Ordem</label>
+                        {{ form.ordem(class="form-control") }}
+                        {% for error in form.ordem.errors %}
+                            <div class="invalid-feedback d-block">{{ error }}</div>
+                        {% endfor %}
+                    </div>
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Data de Publicação</label>
+                        {{ form.data_publicacao(class="form-control", type="datetime-local") }}
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save me-1"></i> Atualizar Slide
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

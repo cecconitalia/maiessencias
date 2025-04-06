@@ -1,0 +1,57 @@
+{% extends "base.html" %}
+
+{% block content %}
+<div class="container-fluid">
+    <div class="d-flex justify-content-between align-items-center mb-4">
+        <h1 class="h3 mb-0 text-gray-800">
+            <i class="bi bi-plus-circle me-2"></i> Novo Slide
+        </h1>
+        <a href="{{ url_for('admin_slides') }}" class="btn btn-secondary">
+            <i class="bi bi-arrow-left me-1"></i> Voltar
+        </a>
+    </div>
+
+    <div class="card shadow">
+        <div class="card-body">
+            <form method="POST" enctype="multipart/form-data">
+                {{ form.hidden_tag() }}
+                
+                <div class="mb-3">
+                    <label class="form-label">Título</label>
+                    {{ form.titulo(class="form-control", placeholder="Título do slide") }}
+                </div>
+
+                <div class="mb-3">
+                    <label class="form-label">Conteúdo</label>
+                    {{ form.conteudo(class="form-control", rows=4, placeholder="Texto descritivo") }}
+                </div>
+
+                <div class="row">
+                    <div class="col-md-6 mb-3">
+                        <label class="form-label">Imagem</label>
+                        {{ form.imagem(class="form-control") }}
+                        <small class="form-text text-muted">Formatos suportados: JPG, PNG (max 5MB)</small>
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Status</label>
+                        {{ form.ativo(class="form-select") }}
+                    </div>
+                    <div class="col-md-3 mb-3">
+                        <label class="form-label">Data de Publicação</label>
+                        {{ form.data_publicacao(class="form-control", type="datetime-local") }}
+                    </div>
+                </div>
+
+                <div class="d-grid gap-2 d-md-flex justify-content-md-end">
+                    <button type="reset" class="btn btn-outline-secondary">
+                        <i class="bi bi-x-circle me-1"></i> Limpar
+                    </button>
+                    <button type="submit" class="btn btn-primary">
+                        <i class="bi bi-save me-1"></i> Salvar Slide
+                    </button>
+                </div>
+            </form>
+        </div>
+    </div>
+</div>
+{% endblock %}

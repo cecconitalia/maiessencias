@@ -1,0 +1,206 @@
+/* ===== ESTILOS GERAIS ===== */
+body {
+  background-color: #f0f0f0;
+}
+
+/* ===== NAVBAR ===== */
+.navbar {
+  background-color: #000000;
+}
+
+.navbar-brand img {
+  width: 50px;
+  height: auto;
+}
+
+.navbar-brand {
+  color: #FFD700;
+}
+
+.navbar-brand:hover {
+  color: #FFDD44;
+}
+
+.navbar-nav .nav-link {
+  color: #fff;
+}
+
+.navbar-nav .nav-link:hover {
+  color: #FFD700;
+}
+
+.navbar-nav .nav-item {
+  margin-right: 15px;
+}
+
+/* ===== PRODUTOS ===== */
+.produto-card {
+  margin-bottom: 20px;
+  transition: transform 0.2s ease-in-out;
+  position: relative;
+  height: 100%;
+}
+
+.produto-card:hover {
+  transform: scale(1.02);
+  box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+}
+
+.produto-imagem {
+  width: 100%;
+  object-fit: contain;
+  border-radius: 8px 8px 0 0;
+  cursor: pointer;
+  background-color: #fff;
+  padding: 10px;
+}
+
+.card-body {
+  padding: 15px;
+}
+
+.card-title {
+  font-size: 1rem;
+  font-weight: bold;
+  margin-bottom: 0.3rem;
+  line-height: 1.2;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+.card-subtitle {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-bottom: 0.3rem;
+}
+
+.card-text {
+  font-size: 0.85rem;
+  margin-bottom: 0.8rem;
+}
+
+/* ===== LAYOUT RESPONSIVO ===== */
+@media (max-width: 575.98px) {
+  .col-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+    padding: 0 5px;
+  }
+  
+  .produto-imagem {
+    height: 140px;
+  }
+  
+  .card-title {
+    font-size: 0.85rem;
+  }
+
+@media (min-width: 576px) and (max-width: 991.98px) {
+  .col-md-6 {
+    flex: 0 0 50%;
+    max-width: 50%;
+  }
+  
+  .produto-imagem {
+    height: 200px;
+  }
+  
+  .card-title {
+    font-size: 1rem;
+  }
+
+@media (min-width: 992px) {
+  .col-lg-3 {
+    flex: 0 0 25%;
+    max-width: 25%;
+  }
+  
+  .produto-imagem {
+    height: 250px;
+  }
+  
+  .card-title {
+    font-size: 1.1rem;
+  }
+}
+
+/* ===== BOTÕES ===== */
+.btn-custom {
+  font-size: 12px;
+  padding: 6px 12px;
+  border-radius: 20px;
+  width: 100%;
+  height: 32px;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.btn-custom i {
+  font-size: 14px;
+  margin-right: 5px;
+}
+
+@media (max-width: 767.98px) {
+  .btn-custom {
+    font-size: 11px;
+    padding: 5px 8px;
+    height: 28px;
+  }
+  
+  .btn-custom i {
+    font-size: 12px;
+  }
+}
+
+/* ===== COMPONENTES ADICIONAIS ===== */
+#backToTop {
+  display: none;
+  position: fixed;
+  bottom: 20px;
+  right: 20px;
+  z-index: 99;
+  border: none;
+  outline: none;
+  background-color: #000;
+  color: #FFD700;
+  cursor: pointer;
+  padding: 10px;
+  border-radius: 50%;
+}
+
+#backToTop:hover {
+  background-color: #333;
+}
+
+.whatsapp-btn {
+  background-color: #25D366;
+  color: white;
+  font-size: 14px;
+  padding: 8px 16px;
+  border-radius: 25px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+}
+
+.whatsapp-btn i {
+  font-size: 18px;
+  margin-right: 8px;
+}
+
+.pagination {
+  margin-top: 30px;
+}
+
+.page-item.active .page-link {
+  background-color: #000;
+  border-color: #000;
+}
+
+.page-link {
+  color: #000;
+}

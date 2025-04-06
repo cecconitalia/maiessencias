@@ -1,0 +1,7 @@
+<h1 class="animate__animated animate__bounceIn animate__fast">
+{{ slide.titulo }}
+</h1>
+
+<p class="animate__animated animate__fadeInUp animate__delay-1s">
+{{ slide.conteudo }}
+</p>

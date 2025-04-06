@@ -1,0 +1,283 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mai Essências e Aromas - {% block title %}{% endblock %}</title>
+
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/animate.css/4.1.1/animate.min.css"/>
+
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.3/font/bootstrap-icons.min.css">
+
+    <link rel="icon" href="{{ url_for('static', filename='favicon.ico') }}" type="image/x-icon">
+
+    <meta name="csrf-token" content="{{ csrf_token() }}">
+
+    <style>
+        /* === Cores Tema Rosa === */
+        :root {
+            --cor-primaria-rosa: #E91E63;
+            --cor-primaria-rosa-hover: #D81B60;
+            --cor-secundaria-rosa: #F8BBD0;
+            --cor-texto-rosa: #fff;
+            --cor-fundo-claro: #fef0f5; /* Fundo rosa bem claro */
+        }
+
+        {% if request.path.startswith('/admin') %}
+        /* Estilos específicos para admin */
+        body.admin-layout {
+            background-color: #f8f9fa; /* Manter fundo padrão admin */
+        }
+        .admin-navbar {
+            background-color: #fff;
+            box-shadow: 0 0.125rem 0.25rem rgba(0, 0, 0, 0.075);
+            padding: 0.5rem 1rem;
+        }
+        .admin-main {
+            padding: 20px;
+        }
+        .admin-layout .btn-primary {
+            background-color: var(--cor-primaria-rosa) !important;
+            border-color: var(--cor-primaria-rosa) !important;
+            color: var(--cor-texto-rosa) !important;
+        }
+        .admin-layout .btn-primary:hover {
+            background-color: var(--cor-primaria-rosa-hover) !important;
+            border-color: var(--cor-primaria-rosa-hover) !important;
+        }
+        .admin-layout .text-primary {
+           color: var(--cor-primaria-rosa) !important;
+        }
+        .admin-layout .page-item.active .page-link {
+          background-color: var(--cor-primaria-rosa) !important;
+          border-color: var(--cor-primaria-rosa) !important;
+        }
+        .admin-layout .page-link {
+          color: var(--cor-primaria-rosa) !important;
+        }
+        .admin-layout .page-link:hover {
+           color: var(--cor-primaria-rosa-hover) !important;
+           background-color: #fce4ec !important;
+        }
+        .admin-layout .card-header.bg-primary { /* Para headers de card admin */
+            background-color: var(--cor-primaria-rosa) !important;
+            color: var(--cor-texto-rosa) !important;
+        }
+
+
+        {% else %}
+        /* Estilos normais (não admin) */
+        body {
+             background-color: var(--cor-fundo-claro);
+        }
+        .card {
+            border-radius: 15px;
+        }
+        .card-header {
+            border-radius: 15px 15px 0 0 !important;
+        }
+        .form-control:focus {
+            box-shadow: 0 0 0 0.25rem rgba(233, 30, 99, 0.25); /* Sombra Rosa */
+            border-color: var(--cor-primaria-rosa); /* Borda rosa no foco */
+        }
+        .invalid-feedback {
+            display: block;
+        }
+        main {
+            min-height: calc(100vh - 150px);
+            padding: 20px 0;
+        }
+        /* Navbar padrão (não admin) com bg-dark */
+       .navbar.bg-dark {
+          background-color: var(--cor-primaria-rosa) !important; /* Cor primária rosa */
+        }
+       .navbar.bg-dark .navbar-brand {
+          color: var(--cor-texto-rosa) !important; /* Texto branco */
+       }
+       .navbar.bg-dark .navbar-nav .nav-link {
+          color: var(--cor-texto-rosa) !important; /* Texto branco */
+        }
+       .navbar.bg-dark .navbar-nav .nav-link:hover {
+          color: var(--cor-secundaria-rosa) !important; /* Rosa claro no hover */
+        }
+
+       /* Overrides Globais Bootstrap (não admin) */
+      .btn-primary {
+        background-color: var(--cor-primaria-rosa) !important;
+        border-color: var(--cor-primaria-rosa) !important;
+        color: var(--cor-texto-rosa) !important;
+      }
+      .btn-primary:hover, .btn-primary:focus {
+        background-color: var(--cor-primaria-rosa-hover) !important;
+        border-color: var(--cor-primaria-rosa-hover) !important;
+        box-shadow: none !important;
+      }
+       .text-primary {
+           color: var(--cor-primaria-rosa) !important;
+       }
+       .page-item.active .page-link { /* Paginação */
+          background-color: var(--cor-primaria-rosa) !important;
+          border-color: var(--cor-primaria-rosa) !important;
+        }
+       .page-link { /* Cor do texto da paginação */
+          color: var(--cor-primaria-rosa) !important;
+        }
+       .page-link:hover {
+           color: var(--cor-primaria-rosa-hover) !important;
+           background-color: #fce4ec !important; /* Fundo rosa bem claro */
+       }
+       .list-group-item.active { /* Para menu do perfil */
+           background-color: var(--cor-primaria-rosa);
+           border-color: var(--cor-primaria-rosa);
+       }
+        {% endif %}
+
+        /* Estilo Geral para Alertas */
+        .alert-success {
+            background-color: #d1e7dd; /* Manter verde suave ou ajustar */
+            border-color: #badbcc;
+            color: #0f5132;
+        }
+        .alert-danger {
+            background-color: #f8d7da; /* Manter vermelho suave */
+            border-color: #f5c2c7;
+            color: #842029;
+        }
+        .alert-warning {
+            background-color: #fff3cd; /* Manter amarelo suave */
+            border-color: #ffecb5;
+            color: #664d03;
+        }
+         .alert-info {
+            background-color: #cfe2ff; /* Manter azul suave */
+            border-color: #b6d4fe;
+            color: #084298;
+        }
+
+    </style>
+</head>
+<body class="{% if request.path.startswith('/admin') %}admin-layout{% endif %}">
+    {% if not request.path.startswith('/admin') %}
+    <nav class="navbar navbar-expand-lg navbar-dark bg-dark">
+        <div class="container">
+            <a class="navbar-brand" href="/">Mai Essências e Aromas</a>
+            <button class="navbar-toggler" type="button" data-bs-toggle="collapse" data-bs-target="#navbarNav" aria-controls="navbarNav" aria-expanded="false" aria-label="Alternar navegação">
+                <span class="navbar-toggler-icon" style="background-image: url(\"data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='rgba(255, 255, 255, 0.75)' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e\");"></span>
+            </button>
+            <div class="collapse navbar-collapse" id="navbarNav">
+                <ul class="navbar-nav ms-auto">
+                    {% if current_user.is_authenticated %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('perfil') }}">
+                                <i class="bi bi-person-circle"></i> Perfil
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('logout') }}">
+                                <i class="bi bi-box-arrow-right"></i> Sair
+                            </a>
+                        </li>
+                    {% else %}
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('login') }}">
+                                <i class="bi bi-box-arrow-in-right"></i> Login
+                            </a>
+                        </li>
+                        <li class="nav-item">
+                            <a class="nav-link" href="{{ url_for('registrar') }}">
+                                <i class="bi bi-person-plus"></i> Registrar
+                            </a>
+                        </li>
+                    {% endif %}
+                </ul>
+            </div>
+        </div>
+    </nav>
+    {% else %}
+    <nav class="admin-navbar navbar navbar-expand">
+        <div class="container-fluid">
+            <div>
+                <a class="btn btn-sm btn-outline-secondary me-2" href="{{ url_for('admin_dashboard') }}">
+                    <i class="bi bi-house"></i> Home
+                </a>
+                 <a class="btn btn-sm btn-outline-secondary me-2" href="{{ url_for('admin_pedidos') }}">Pedidos</a>
+                 <a class="btn btn-sm btn-outline-secondary me-2" href="{{ url_for('admin_usuarios') }}">Usuários</a>
+                 <a class="btn btn-sm btn-outline-secondary me-2" href="{{ url_for('admin_slides') }}">Slides</a>
+                 <a class="btn btn-sm btn-outline-secondary me-2" href="{{ url_for('admin_prime_codes') }}">Códigos Prime</a>
+                 <a class="btn btn-sm btn-outline-secondary" href="{{ url_for('admin_comissoes') }}">Comissões</a>
+            </div>
+            <ul class="navbar-nav">
+                <li class="nav-item">
+                    <span class="navbar-text me-3">Admin: {{ current_user.nome }}</span>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link text-danger" href="{{ url_for('logout') }}">
+                        <i class="bi bi-box-arrow-right"></i> Sair
+                    </a>
+                </li>
+            </ul>
+        </div>
+    </nav>
+    {% endif %}
+
+    <main class="container {% if request.path.startswith('/admin') %}admin-main{% else %}flex-grow-1{% endif %}">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+            {% if messages %}
+                {% for category, message in messages %}
+                    <div class="alert alert-{{ category }} alert-dismissible fade show" role="alert">
+                        {{ message }}
+                        <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Fechar"></button>
+                    </div>
+                {% endfor %}
+            {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
+    </main>
+
+    {% if not request.path.startswith('/admin') %}
+    <footer class="text-white mt-auto" style="background-color: var(--cor-primaria-rosa);">
+        <div class="container py-3">
+            <div class="text-center">
+                <p class="mb-0">&copy; 2025 Mai Essências e Aromas - Todos os direitos reservados</p>
+                 <small>Desenvolvido com <i class="bi bi-heart-fill text-danger"></i></small>
+            </div>
+        </div>
+    </footer>
+    {% endif %}
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+    <script>
+        (() => {
+            'use strict'
+            const forms = document.querySelectorAll('.needs-validation')
+            Array.from(forms).forEach(form => {
+                form.addEventListener('submit', event => {
+                    if (!form.checkValidity()) {
+                        event.preventDefault()
+                        event.stopPropagation()
+                    }
+                    form.classList.add('was-validated')
+                }, false)
+            })
+        })()
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            var tooltipTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="tooltip"]'));
+            var tooltipList = tooltipTriggerList.map(function (tooltipTriggerEl) {
+                return new bootstrap.Tooltip(tooltipTriggerEl);
+            });
+
+            var popoverTriggerList = [].slice.call(document.querySelectorAll('[data-bs-toggle="popover"]'));
+            var popoverList = popoverTriggerList.map(function (popoverTriggerEl) {
+                return new bootstrap.Popover(popoverTriggerEl);
+            });
+        });
+    </script>
+</body>
+</html>
